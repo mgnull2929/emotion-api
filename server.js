@@ -11,6 +11,9 @@ dotenv.config();
 const app = express();
 app.use(cors());           // ← now app exists
 app.use(express.json());
+app.use(express.static("public"));
+
+
 
 // 3. Initialize OpenAI client
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
