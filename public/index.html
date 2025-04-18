@@ -5,7 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Adaptive Emotion Identifier Quiz</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      background-image: url("Mckfeelingsbkrd.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
     .step { display: none; }
     .step.active { display: block; }
     .slider-row { display: flex; align-items: center; justify-content: space-between; margin: 20px 0; }
@@ -27,7 +36,6 @@
     .map-link { text-align: center; margin: 15px 0; }
     .map-link a { color: #007BFF; text-decoration: none; font-weight: bold; }
     #details { margin-top: 1em; }
-
     .fallback-results p, .ai-results li {
       background: #f9f9f9;
       border-left: 4px solid #4CAF50;
@@ -144,8 +152,7 @@
 
       try {
         const BASE_URL = "https://emotion-api-0y8p.onrender.com";
-const resp = await fetch(`${BASE_URL}/api/term`, {
-
+        const resp = await fetch(`${BASE_URL}/api/term`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ question: q.prompt, value: val })
