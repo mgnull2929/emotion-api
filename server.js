@@ -9,9 +9,11 @@ dotenv.config();
 
 // 2. Create and configure Express
 const app = express();
-app.use(cors());           // ← now app exists
+app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static("public")); // ← this line serves index.html from /public
+
+
 
 
 
