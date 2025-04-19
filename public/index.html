@@ -11,7 +11,10 @@
       padding: 20px;
       max-width: 600px;
       margin: auto;
-      background: linear-gradient(120deg, #e0f7fa, #fffde7);
+      background-image: url("Mckfeelingsbkrd.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
       transition: background 1s ease;
     }
     .step { display: none; }
@@ -40,11 +43,20 @@
       cursor: pointer;
     }
     button {
-      padding: 12px 24px;
-      margin-top: 20px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+  background: url("Cloud.png") no-repeat center center;
+  background-size: contain;
+  border: none;
+  color: #000;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 30px 60px;
+  cursor: pointer;
+  text-align: center;
+  text-shadow: 0 0 2px #fff;
+  mix-blend-mode: luminosity;
+  transition: filter 0.3s ease;
+  filter: brightness(1.1) contrast(1.1);
+}
     #output {
       margin-top: 30px;
       padding: 20px;
@@ -63,17 +75,60 @@
       height: 80px;
       margin-top: 10px;
     }
+      @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      button {
+        padding: 20px 40px;
+        font-size: 0.9rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+</style>
+  <style>
+    .slider-value {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #333;
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
+    .fade-in {
+      animation: fadeIn 0.6s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    button:hover {
+      transform: scale(1.05);
+      filter: brightness(1.15);
+    }
+    .step-count {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #222;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
-  <div id="quiz-container">
-    <div id="question" class="step active">
+  <h1 style="text-align: center; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 2rem; margin-bottom: 10px; text-shadow: 1px 1px 2px #fff;">What are you McKFeeling like today?</h1>
+  <div id="intro" class="step active">
+    <h1>Emotion Identifier Quiz</h1>
+    <p>This quiz helps you pinpoint your current feeling by guiding you through slider-based questions drawn from therapeutic techniques.</p>
+    <button onclick="startQuiz()">Start Quiz</button>
+  </div>
+
+  <div id="quiz-container" class="step">
+    <div id="question" class="fade-in">
+      <div class="step-count" id="step-count"></div>
       <h2 id="question-text"></h2>
-      <div class="slider-row">
-        <span class="slider-label" id="left-label"></span>
-        <input type="range" id="slider" min="1" max="5" value="3">
-        <span class="slider-label" id="right-label"></span>
-      </div>
+      <div class="slider-row">$1</div>
+<div class="slider-value" id="slider-value">You chose: Neutral</div>
       <button onclick="nextQuestion()">Next</button>
     </div>
     <div id="output" class="step"></div>
@@ -83,39 +138,48 @@
       <button onclick="copySummary()">Copy to Clipboard</button>
     </div>
   </div>
+
   <script>
+    function startQuiz() {
+      document.getElementById("intro").classList.remove("active");
+      document.getElementById("quiz-container").classList.add("active");
+      document.getElementById("question").classList.add("fade-in");
+  document.getElementById("step-count").textContent = getStepLabel(currentId);
+  loadQuestion(questionBank[currentId]);
+    }
+
     const questionBank = {
       q1: {
         id: "q1",
-        text: "How pleasant or unpleasant do you feel right now?",
+        text: "Thinking about how you feel right now, how pleasant or unpleasant is your current experience?",
         left: "Unpleasant",
         right: "Pleasant",
         next: (val) => val <= 2 ? "q2_low" : val >= 4 ? "q2_high" : "q2_mid"
       },
       q2_low: {
         id: "q2_low",
-        text: "Do you feel more tired or more sad?",
+        text: "In this moment, does your low energy feel more like tiredness or sadness?",
         left: "Tired",
         right: "Sad",
         next: () => "q3"
       },
       q2_mid: {
         id: "q2_mid",
-        text: "Do you feel more stable or more distracted?",
+        text: "As you reflect on today, are you feeling more grounded or more scattered in focus?",
         left: "Stable",
         right: "Distracted",
         next: () => "q3"
       },
       q2_high: {
         id: "q2_high",
-        text: "Do you feel more joyful or excited?",
+        text: "When you think about your current good mood, does it feel more joyful or more excited?",
         left: "Joyful",
         right: "Excited",
         next: () => "q3"
       },
       q3: {
         id: "q3",
-        text: "How energized do you feel right now?",
+        text: "Right now, how energized or activated do you feel in your body and mind?",
         left: "Deactivated",
         right: "Activated",
         next: () => null
@@ -130,20 +194,29 @@
   document.getElementById("left-label").textContent = q.left;
   document.getElementById("right-label").textContent = q.right;
   document.getElementById("slider").value = 3;
+  document.getElementById("slider-value").textContent = "You chose: Neutral";
+  document.getElementById("question").classList.add("fade-in");
 
-  // Update background dynamically based on question ID or category
-  const dynamicGradients = {
-    q1: "linear-gradient(120deg, #fceabb, #f8b500)",
-    q2_low: "linear-gradient(120deg, #ffd6d6, #ffeaea)",
-    q2_mid: "linear-gradient(120deg, #e0f7fa, #fefcea)",
-    q2_high: "linear-gradient(120deg, #d0ffd6, #f0fff0)",
-    q3: "linear-gradient(120deg, #e6e6fa, #ffffff)"
+  const buttonTintByQuestion = {
+    q1: "hue-rotate(180deg)",
+    q2_low: "hue-rotate(0deg) brightness(1.1)",
+    q2_mid: "hue-rotate(60deg)",
+    q2_high: "hue-rotate(90deg)",
+    q3: "hue-rotate(240deg)"
   };
-  document.body.style.background = dynamicGradients[q.id] || "linear-gradient(120deg, #f0f8ff, #fffbe6)";
+
+  const buttons = document.querySelectorAll("button");
+  buttons.forEach(btn => {
+    btn.style.filter = buttonTintByQuestion[q.id] || "none";
+  });
 }
 
     function nextQuestion() {
+  document.getElementById("step-count").textContent = getStepLabel(currentId);
+  document.getElementById("question").classList.remove("fade-in");
       const sliderValue = +document.getElementById("slider").value;
+      const labelMap = ["Very left", "Left", "Neutral", "Right", "Very right"];
+      document.getElementById("slider-value").textContent = `You chose: ${labelMap[sliderValue - 1]}`;
       const current = questionBank[currentId];
       answers.push({ prompt: current.text, value: sliderValue });
       const nextId = typeof current.next === "function" ? current.next(sliderValue) : null;
@@ -157,51 +230,95 @@
     }
 
     async function showResults() {
-      document.getElementById("question").classList.remove("active");
-      const res = await fetch("/api/analyze", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ questions: answers })
-      });
-      const data = await res.json();
-      const emotion = data.emotion || "calm";
-      const definition = data.definition || "You feel steady and relaxed.";
-      const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "still, balanced, content";
-      setGradient(emotion);
-      const resultText = `Emotion: ${emotion}\nDefinition: ${definition}\nSynonyms: ${synonyms}`;
-      document.getElementById("output").innerHTML = `
-        <h2>Your Emotional Snapshot</h2>
-        <p><strong>Emotion:</strong> ${emotion}</p>
-        <p><strong>Definition:</strong> ${definition}</p>
-        <p><strong>Synonyms:</strong> ${synonyms}</p>
-        <button onclick=\"location.reload()\">Try Again</button>
-      `;
-      document.getElementById("summary").value = resultText;
-      document.getElementById("output").classList.add("active");
-      document.getElementById("share").classList.add("active");
+  document.getElementById("question").classList.remove("active");
+  const res = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ questions: answers })
+  });
+  const data = await res.json();
+  const emotion = data.emotion || "calm";
+  const definition = data.definition || "You feel steady and relaxed.";
+  const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "still, balanced, content";
+  const resultText = `Emotion: ${emotion}
+Definition: ${definition}
+Synonyms: ${synonyms}`;
+  const emojiMap = {
+    calm: "🧘",
+    anxious: "😰",
+    excited: "😄",
+    sad: "😢",
+    angry: "😠",
+    numb: "😶",
+    content: "😊",
+    happy: "😃",
+    reflective: "🪞",
+    bored: "😐",
+    hopeful: "🌤️",
+    discouraged: "😞"
+  };
+  const emoji = emojiMap[emotion] || "🙂";
+  document.getElementById("output").innerHTML = `
+    <h2>Your Emotional Snapshot</h2>
+    <p><strong>Emotion:</strong> ${emoji} ${emotion}</p>
+    <p><strong>Definition:</strong> ${definition}</p>
+    <p><strong>Synonyms:</strong> ${synonyms}</p>
+    <p><em>${getEmotionInsight(emotion)}</em></p>
+    <button onclick=\"location.reload()\">Try Again</button>
+  `;
+  document.getElementById("summary").value = resultText;
+  document.getElementById("output").classList.add("active");
+  document.getElementById("share").classList.add("active");
+
+  // Set button tint based on emotion
+  const buttons = document.querySelectorAll("button");
+  const tintMap = {
+    calm: "hue-rotate(180deg)",
+    anxious: "hue-rotate(0deg) brightness(1.1)",
+    excited: "hue-rotate(60deg)",
+    sad: "hue-rotate(220deg)",
+    angry: "hue-rotate(330deg) brightness(1.2)"
+  };
+  buttons.forEach(btn => {
+    btn.style.filter = tintMap[emotion] || "none";
+  });
     }
 
-    function setGradient(emotion) {
-      const body = document.body;
-      const gradients = {
-        calm: "linear-gradient(120deg, #d0f0fd, #fafff0)",
-        anxious: "linear-gradient(120deg, #ffd6d6, #fffbe6)",
-        excited: "linear-gradient(120deg, #ffefd5, #e0f7fa)",
-        sad: "linear-gradient(120deg, #dfe9f3, #f6f6f6)",
-        angry: "linear-gradient(120deg, #ffcccc, #ffe6e6)"
-      };
-      body.style.background = gradients[emotion] || "linear-gradient(120deg, #f0f8ff, #fffbe6)";
-    }
+    function getEmotionInsight(emotion) {
+  const insights = {
+    calm: "Calm often means your body feels safe and your environment feels predictable.",
+    anxious: "Anxiety can signal uncertainty or unmet needs for safety or clarity.",
+    excited: "Excitement often arises when you're anticipating something joyful or novel.",
+    sad: "Sadness may appear when something important feels lost or missing.",
+    angry: "Anger often reflects a boundary crossed or a need for justice.",
+    numb: "Numbness can be your mind's way of shielding from overwhelm.",
+    content: "Contentment comes from having your basic emotional needs met.",
+    happy: "Happiness can reflect alignment between your actions and values.",
+    reflective: "Reflectiveness shows openness to insight and inner exploration.",
+    bored: "Boredom might mean your curiosity or engagement needs attention.",
+    hopeful: "Hope points to possibility and belief in change.",
+    discouraged: "Discouragement may show up when effort isn't met with progress."
+  };
+  return insights[emotion] || "Your emotion gives clues about what matters to you.";
+}
 
-    function copySummary() {
+function copySummary() {
       const textarea = document.getElementById("summary");
       textarea.select();
       textarea.setSelectionRange(0, 99999);
       document.execCommand("copy");
       alert("Copied to clipboard!");
     }
-
-    loadQuestion(questionBank[currentId]);
-  </script>
+  function getStepLabel(id) {
+  const map = {
+    q1: "Step 1 of 3",
+    q2_low: "Step 2 of 3",
+    q2_mid: "Step 2 of 3",
+    q2_high: "Step 2 of 3",
+    q3: "Step 3 of 3"
+  };
+  return map[id] || "";
+}
+</script>
 </body>
 </html>
