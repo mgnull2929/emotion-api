@@ -177,26 +177,78 @@
       }
     }
 
-    async function showResults() {
-      document.getElementById('results').classList.add('active');
+    
+  async function showResults() {
+    const terms = Object.entries(answers)
+      .filter(([k]) => k.startsWith("Term"))
+      .map(([, v]) => v)
+      .filter(Boolean);
 
-      try {
-        const response = await fetch("https://emotion-api-0y8p.onrender.com/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers })
+    // fallback: no AI results
+    if (terms.length === 0) {
+      const syn = {
+        Calm: ["peaceful", "serene", "tranquil"], Agitated: ["restless", "anxious", "irritable"],
+        Peaceful: ["calm", "quiet", "soothing"], Contented: ["satisfied", "pleased", "comfortable"],
+        Restless: ["uneasy", "fidgety", "antsy"], Tense: ["nervous", "tight", "strained"],
+        Affectionate: ["loving", "fond", "warm"], Resentful: ["bitter", "spiteful", "angry"],
+        Supportive: ["encouraging", "helpful", "caring"], Critical: ["judgmental", "disapproving", "fault-finding"],
+        Irritation: ["annoyance", "vexation", "aggravation"], "Deep Anger": ["fury", "rage", "wrath"]
+      };
+
+      const lines = [];
+      Object.keys(answers).filter(k => k.startsWith("Q")).forEach(qk => {
+        const num = qk.slice(1);
+        const val = answers[qk];
+        const q = (num === "1") ? "self-directed vs other-directed" : currentBranch[Number(num) - 2].prompt;
+        const { left, right } = (num === "1") ? { left: "Self", right: "Others" } : currentBranch[Number(num) - 2];
+        const lean = val > 3 ? right : val < 3 ? left : "balanced";
+        const choices = syn[lean] || ["(no synonyms available)"];
+        lines.push(`Q${num} (${q}): you chose ${val} → ${lean}. Could also be ${choices.join(", ")}.`);
+      });
+
+      document.getElementById('output').innerHTML =
+        `<div class="fallback-results">${lines.map(l => `<p>${l}</p>`).join("")}</div>`;
+    } else {
+      // NEW: full AI analysis of all responses
+      const rawQuestions = Object.entries(answers)
+        .filter(([k]) => k.startsWith("Q"))
+        .map(([k, v]) => {
+          const i = +k.slice(1) - 2;
+          const prompt = k === "Q1" ? "self-directed vs other-directed" : currentBranch[i]?.prompt;
+          return { prompt, value: v };
         });
 
-        const data = await response.json();
-        const emotion = data.emotion || "(no response)";
-        document.getElementById('output').innerHTML =
-          `<div class="ai-results"><p>Most likely emotion: <strong>${emotion}</strong></p></div>`;
+      let overallTerm = null;
+      try {
+        const resp = await fetch("https://emotion-api-0y8p.onrender.com/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ questions: rawQuestions })
+        });
+        const data = await resp.json();
+        overallTerm = data.overall;
       } catch (err) {
-        document.getElementById('output').innerHTML =
-          `<div class="fallback-results"><p>There was a problem getting your result. Try again later.</p></div>`;
-        console.error(err);
+        console.warn("AI analyze error:", err);
       }
+
+      const freq = terms.reduce((f, t) => (f[t] = (f[t] || 0) + 1, f), {});
+      const total = terms.length;
+      const top3 = Object.entries(freq)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([t, c]) => `<li><strong>${t}</strong>: ${Math.round(c / total * 100)}%</li>`);
+
+      const summary = overallTerm
+        ? `<p><strong>Overall:</strong> ${overallTerm}</p>`
+        : "";
+
+      document.getElementById('output').innerHTML =
+        `<div class="ai-results">${summary}<ul>${top3.join("")}</ul></div>`;
     }
+
+    document.getElementById('results').classList.add('active');
+  }
+
 
     function updateProgress(idx, total) {
       const pct = Math.round(((idx + 1) / (total + 1)) * 100);
