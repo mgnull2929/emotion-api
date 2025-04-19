@@ -116,7 +116,7 @@
   </style>
 </head>
 <body>
-  <h1 style="text-align: center; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 2rem; margin-bottom: 10px; text-shadow: 1px 1px 2px #fff;">What are you McKFeeling like today?</h1>
+  <h1 style="text-align: center; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 1.4rem; margin-top: 10px; margin-bottom: 5px; text-shadow: 1px 1px 2px #fff;">What are you McKFeeling like today?</h1>
   <div id="intro" class="step active">
     <h1>Emotion Identifier Quiz</h1>
     <p>This quiz helps you pinpoint your current feeling by guiding you through slider-based questions drawn from therapeutic techniques.</p>
@@ -127,7 +127,11 @@
     <div id="question" class="fade-in">
       <div class="step-count" id="step-count"></div>
       <h2 id="question-text"></h2>
-      <div class="slider-row">$1</div>
+      <div class="slider-row">
+  <span class="slider-label" id="left-label"></span>
+  <input id="slider" type="range" min="1" max="5" step="1" value="3" />
+  <span class="slider-label" id="right-label"></span>
+</div>
 <div class="slider-value" id="slider-value">You chose: Neutral</div>
       <button onclick="nextQuestion()">Next</button>
     </div>
