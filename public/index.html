@@ -93,7 +93,7 @@
     <li>See where you land on an emotion wheel</li>
     <li>Get a one-word emotion, synonyms, and insight</li>
   </ul>
-  $1
+  <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="startQuiz()">Start Quiz</button>
 
 <div class="progress-container" style="margin-top: 30px;">
     </div>
@@ -174,6 +174,25 @@ document.getElementById("output").classList.add("active");
     // Background gradient change removed per user preference
   
 </script>
+
+<div id="question" class="step">
+  <h2 id="question-text"></h2>
+  <div class="slider-row">
+    <span class="slider-label"></span>
+    <input type="range" id="slider" min="1" max="5" value="3" />
+    <span class="slider-label"></span>
+  </div>
+  <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="nextQuestion()">Next</button>
+
+  <div class="progress-container" style="margin-top: 30px;">
+    <div class="progress-label">Progress:</div>
+    <div class="progress-bar">
+      <div class="progress-thumb" id="progress-thumb">
+        <img src="Car2.png" alt="car" style="height: 20px;" />
+      </div>
+    </div>
+  </div>
+</div>
 
 
 </body>
