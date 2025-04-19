@@ -4,101 +4,124 @@ import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
 
-// Load environment variables
 dotenv.config();
 
-// Configure Express
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public")); // Serve HTML and static assets
+app.use(express.static("public"));
 
-// Initialize OpenAI client
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// Single adjective generator
-app.post("/api/term", async (req, res) => {
-  const { question, value } = req.body;
-  try {
-    const chat = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: "You're a therapist. Given the question and slider value, return one emotional adjective only." },
-        { role: "user", content: `Q: ${question}\nSlider value: ${value}` }
-      ]
-    });
+const emotionClusters = {
+  calm: ["relaxed", "still", "peaceful"],
+  content: ["satisfied", "comfortable", "okay"],
+  reflective: ["thoughtful", "pensive", "introspective"],
+  anxious: ["nervous", "uneasy", "worried"],
+  angry: ["frustrated", "irritated", "resentful"],
+  sad: ["down", "blue", "gloomy"],
+  happy: ["joyful", "cheerful", "bright"],
+  excited: ["energized", "thrilled", "pumped"],
+  bored: ["disengaged", "uninterested", "dull"],
+  motivated: ["driven", "focused", "determined"],
+  overwhelmed: ["pressured", "tense", "burdened"],
+  numb: ["blank", "detached", "flat"],
+  hopeful: ["optimistic", "confident", "encouraged"],
+  discouraged: ["hopeless", "defeated", "beaten"]
+};
 
-    const term = chat.choices[0].message.content.trim();
-    res.json({ term });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error generating term", detail: err.message });
-  }
-});
-
-// Full emotion analysis
-app.post("/api/analyze", async (req, res) => {
-  const { questions } = req.body;
-  const basePrompt = questions.map((q, i) => `Q${i + 1}: ${q.prompt} → ${q.value}`).join("\n");
-
-  const prompt = `
-You are an expert in emotional psychology. Analyze the following slider-based responses and provide:
-
-1. A single-word emotional state that best fits the overall answers.
-2. A plain-language definition of that emotional state.
-3. Three emotional synonyms.
-
-Always give a meaningful result, even if all answers are neutral. In neutral cases, use words like "calm", "centered", "balanced", "reflective", or "content". Never return "unknown", "none", or vague results.
-
-Format your output strictly as valid JSON:
-{
-  "emotion": "emotion word",
-  "definition": "a clear definition",
-  "synonyms": ["syn1", "syn2", "syn3"]
+function fallbackEmotion() {
+  return {
+    emotion: "calm",
+    definition: "Calm means feeling at ease, unbothered, and mentally quiet.",
+    synonyms: emotionClusters["calm"]
+  };
 }
 
-Here are the answers:
-${basePrompt}
+function getValenceArousal(answers) {
+  let valence = null;
+  let arousal = null;
+  for (const a of answers) {
+    if (a.prompt.toLowerCase().includes("pleasant")) valence = a.value;
+    if (a.prompt.toLowerCase().includes("energized")) arousal = a.value;
+  }
+  return { valence, arousal };
+}
+
+app.post("/api/analyze", async (req, res) => {
+  const { questions } = req.body;
+  if (!questions || questions.length === 0) return res.json(fallbackEmotion());
+
+  const { valence, arousal } = getValenceArousal(questions);
+
+  if (valence >= 4 && arousal <= 3) return res.json({
+    emotion: "calm",
+    definition: "You feel steady, settled, and unbothered.",
+    synonyms: emotionClusters["calm"]
+  });
+  if (valence <= 2 && arousal >= 4) return res.json({
+    emotion: "anxious",
+    definition: "Anxious means feeling tense, uneasy, or uncertain.",
+    synonyms: emotionClusters["anxious"]
+  });
+  if (valence <= 2 && arousal <= 2) return res.json({
+    emotion: "numb",
+    definition: "Numb means feeling emotionally disconnected or blank.",
+    synonyms: emotionClusters["numb"]
+  });
+  if (valence >= 4 && arousal >= 4) return res.json({
+    emotion: "excited",
+    definition: "Excited means feeling energized, happy, and eager.",
+    synonyms: emotionClusters["excited"]
+  });
+
+  const formatted = questions.map((q, i) => `Q${i + 1}: ${q.prompt} → ${q.value}`).join("\n");
+  const prompt = `
+You are an expert in emotional psychology. A user answered these slider-based prompts. Based on this, return:
+1. One single-word emotion (lowercase).
+2. A short, plain-language definition.
+3. Three synonyms from the same emotion family.
+Return valid JSON like:
+{
+  "emotion": "emotion word",
+  "definition": "clear explanation",
+  "synonyms": ["syn1", "syn2", "syn3"]
+}
+Answers:
+${formatted}
   `;
 
   try {
     const chat = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [
-        { role: "user", content: prompt }
-      ],
+      messages: [{ role: "user", content: prompt }],
       temperature: 0.5
     });
 
     const raw = chat.choices[0].message.content.trim();
     const start = raw.indexOf("{");
     const end = raw.lastIndexOf("}");
-    const cleanJSON = JSON.parse(raw.slice(start, end + 1));
+    const parsed = JSON.parse(raw.slice(start, end + 1));
 
-    // Basic fallback if model somehow returns something unusable
-    const emotion = cleanJSON.emotion?.toLowerCase();
+    const emotion = parsed.emotion?.toLowerCase();
+    const synonyms = emotionClusters[emotion] || parsed.synonyms || [];
+
     if (!emotion || emotion.includes("unknown") || emotion.includes("none")) {
-      return res.json({
-        emotion: "calm",
-        definition: "A peaceful and balanced emotional state.",
-        synonyms: ["serene", "relaxed", "composed"]
-      });
+      return res.json(fallbackEmotion());
     }
 
-    res.json(cleanJSON);
+    return res.json({
+      emotion,
+      definition: parsed.definition,
+      synonyms: synonyms.length === 3 ? synonyms : (emotionClusters[emotion] || [])
+    });
   } catch (err) {
     console.error("Analyze error:", err);
-    // Fallback response on failure
-    res.json({
-      emotion: "calm",
-      definition: "A peaceful and balanced emotional state.",
-      synonyms: ["serene", "relaxed", "composed"]
-    });
+    return res.json(fallbackEmotion());
   }
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ API listening on http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });

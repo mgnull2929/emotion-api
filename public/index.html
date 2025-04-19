@@ -3,27 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Adaptive Emotion Identifier Quiz</title>
+  <title>McKFeelings Quiz</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
       padding: 20px;
       max-width: 600px;
       margin: auto;
-      background-image: url("Mckfeelingsbkrd.png");
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
+      background: linear-gradient(120deg, #e0f7fa, #fffde7);
+      transition: background 1s ease;
     }
-
     .step { display: none; }
     .step.active { display: block; }
-    .slider-row { display: flex; align-items: center; justify-content: space-between; margin: 20px 0; }
+    h2 { margin-bottom: 10px; }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
     .slider-label { width: 120px; text-align: center; }
-
     input[type=range] {
-      -webkit-appearance: none;
-      appearance: none;
       width: 100%;
       height: 6px;
       background: #ddd;
@@ -31,198 +32,176 @@
       outline: none;
       margin: 0 10px;
     }
-
     input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
       width: 16px;
       height: 16px;
       background: #4CAF50;
       border-radius: 50%;
       cursor: pointer;
-      margin-top: -5px;
     }
-
-    .navigation button, .start-btn, .help-btn {
-      background: url("Cloud.png") no-repeat center center;
-      background-size: contain;
-      border: none;
-      color: #000;
-      font-weight: bold;
+    button {
+      padding: 12px 24px;
+      margin-top: 20px;
       font-size: 1rem;
-      padding: 30px 60px;
-      margin: 5px;
       cursor: pointer;
-      text-align: center;
-      text-shadow: 0 0 2px #fff;
     }
-
-    .progress-container { margin-top: 20px; }
-    .progress-label { font-weight: bold; margin-bottom: 5px; }
-    .progress-bar { width: 100%; height: 10px; background-color: #eee; border-radius: 5px; overflow: hidden; }
-    .progress-fill { width: 0%; height: 100%; background-color: #4CAF50; border-radius: 5px; transition: width 0.3s ease; }
-
-    #details { margin-top: 1em; }
-    .ai-results, .fallback-results { background: #fff; padding: 15px; border-radius: 8px; margin-top: 20px; }
-    .ai-results p, .fallback-results p { font-size: 1.1rem; text-align: center; }
+    #output {
+      margin-top: 30px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      text-align: center;
+    }
+    #share {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
-
-  <div id="intro" class="step active">
-    <h1>Emotion Identifier Quiz</h1>
-    <p>This quiz helps you pinpoint your current feeling by guiding you through slider-based questions drawn from therapeutic techniques.</p>
-    <button class="start-btn" onclick="startQuiz()">Start Quiz</button>
-  </div>
-
-  <div id="step0" class="step">
-    <h2>1. Are you feeling more self-directed or other-directed?</h2>
-    <div class="slider-row">
-      <span class="slider-label">Self</span>
-      <input id="slider0" type="range" min="1" max="5" step="1" value="3" />
-      <span class="slider-label">Others</span>
+  <div id="quiz-container">
+    <div id="question" class="step active">
+      <h2 id="question-text"></h2>
+      <div class="slider-row">
+        <span class="slider-label" id="left-label"></span>
+        <input type="range" id="slider" min="1" max="5" value="3">
+        <span class="slider-label" id="right-label"></span>
+      </div>
+      <button onclick="nextQuestion()">Next</button>
     </div>
-    <div class="navigation">
-      <button class="help-btn" onclick="showHelp()">Help</button>
-      <button onclick="handleFirst()">Next</button>
-    </div>
-    <div class="progress-container">
-      <div class="progress-label">Progress</div>
-      <div class="progress-bar"><div class="progress-fill" id="progress-bar"></div></div>
+    <div id="output" class="step"></div>
+    <div id="share" class="step">
+      <h3>Share or Save Your Result</h3>
+      <textarea id="summary" readonly></textarea>
+      <button onclick="copySummary()">Copy to Clipboard</button>
     </div>
   </div>
-
-  <div id="question-step" class="step">
-    <h2 id="qHeader"></h2>
-    <div class="slider-row">
-      <span class="slider-label" id="leftLabel"></span>
-      <input id="slider" type="range" min="1" max="5" step="1" value="3" />
-      <span class="slider-label" id="rightLabel"></span>
-    </div>
-    <div class="navigation">
-      <button onclick="prevAdaptive()">Back</button>
-      <button onclick="nextAdaptive()">Next</button>
-    </div>
-    <div class="progress-container">
-      <div class="progress-label">Progress</div>
-      <div class="progress-bar"><div class="progress-fill" id="progress-bar-2"></div></div>
-    </div>
-  </div>
-
-  <div id="results" class="step">
-    <h2>Your Emotional Snapshot</h2>
-    <div id="output"></div>
-    <button onclick="location.reload()">Start Over</button>
-  </div>
-
   <script>
-    const branchA = [
-      { prompt: 'Are you feeling calm or agitated?', left: 'Calm', right: 'Agitated' },
-      { prompt: 'Is your calm more peaceful or contented?', left: 'Peaceful', right: 'Contented' },
-      { prompt: 'If agitated, is it restless or tense?', left: 'Restless', right: 'Tense' }
-    ];
-    const branchB = [
-      { prompt: 'Is your focus affectionate or resentful?', left: 'Affectionate', right: 'Resentful' },
-      { prompt: 'Do you feel supportive or critical?', left: 'Supportive', right: 'Critical' },
-      { prompt: 'Is your resentment mild irritation or deep anger?', left: 'Irritation', right: 'Deep Anger' }
-    ];
+    const questionBank = {
+      q1: {
+        id: "q1",
+        text: "How pleasant or unpleasant do you feel right now?",
+        left: "Unpleasant",
+        right: "Pleasant",
+        next: (val) => val <= 2 ? "q2_low" : val >= 4 ? "q2_high" : "q2_mid"
+      },
+      q2_low: {
+        id: "q2_low",
+        text: "Do you feel more tired or more sad?",
+        left: "Tired",
+        right: "Sad",
+        next: () => "q3"
+      },
+      q2_mid: {
+        id: "q2_mid",
+        text: "Do you feel more stable or more distracted?",
+        left: "Stable",
+        right: "Distracted",
+        next: () => "q3"
+      },
+      q2_high: {
+        id: "q2_high",
+        text: "Do you feel more joyful or excited?",
+        left: "Joyful",
+        right: "Excited",
+        next: () => "q3"
+      },
+      q3: {
+        id: "q3",
+        text: "How energized do you feel right now?",
+        left: "Deactivated",
+        right: "Activated",
+        next: () => null
+      }
+    };
 
-    let currentBranch = [], stepIndex = 0;
+    let currentId = "q1";
     const answers = [];
 
-    function startQuiz() {
-      document.getElementById('intro').classList.remove('active');
-      document.getElementById('step0').classList.add('active');
-      updateProgress(0, 1);
-    }
+    function loadQuestion(q) {
+  document.getElementById("question-text").textContent = q.text;
+  document.getElementById("left-label").textContent = q.left;
+  document.getElementById("right-label").textContent = q.right;
+  document.getElementById("slider").value = 3;
 
-    function handleFirst() {
-      const val = +document.getElementById('slider0').value;
-      const branch = val >= 3 ? branchB : branchA;
-      currentBranch = branch;
-      answers.push({ prompt: "Self-directed vs Other-directed", value: val });
-      document.getElementById('step0').classList.remove('active');
-      stepIndex = 0;
-      showAdaptive();
-    }
+  // Update background dynamically based on question ID or category
+  const dynamicGradients = {
+    q1: "linear-gradient(120deg, #fceabb, #f8b500)",
+    q2_low: "linear-gradient(120deg, #ffd6d6, #ffeaea)",
+    q2_mid: "linear-gradient(120deg, #e0f7fa, #fefcea)",
+    q2_high: "linear-gradient(120deg, #d0ffd6, #f0fff0)",
+    q3: "linear-gradient(120deg, #e6e6fa, #ffffff)"
+  };
+  document.body.style.background = dynamicGradients[q.id] || "linear-gradient(120deg, #f0f8ff, #fffbe6)";
+}
 
-    function showAdaptive() {
-      const q = currentBranch[stepIndex];
-      document.getElementById('qHeader').textContent = `${stepIndex + 2}. ${q.prompt}`;
-      document.getElementById('leftLabel').textContent = q.left;
-      document.getElementById('rightLabel').textContent = q.right;
-      document.getElementById('question-step').classList.add('active');
-      updateProgress(stepIndex, currentBranch.length);
-    }
+    function nextQuestion() {
+      const sliderValue = +document.getElementById("slider").value;
+      const current = questionBank[currentId];
+      answers.push({ prompt: current.text, value: sliderValue });
+      const nextId = typeof current.next === "function" ? current.next(sliderValue) : null;
 
-    function prevAdaptive() {
-      document.getElementById('question-step').classList.remove('active');
-      if (stepIndex === 0) {
-        document.getElementById('step0').classList.add('active');
+      if (nextId && questionBank[nextId]) {
+        currentId = nextId;
+        loadQuestion(questionBank[currentId]);
       } else {
-        stepIndex--;
-        showAdaptive();
-      }
-    }
-
-    async function nextAdaptive() {
-      const val = +document.getElementById('slider').value;
-      const q = currentBranch[stepIndex];
-      answers.push({ prompt: q.prompt, value: val });
-
-      document.getElementById('question-step').classList.remove('active');
-      if (stepIndex < currentBranch.length - 1) {
-        stepIndex++;
-        showAdaptive();
-      } else {
-        await showResults();
+        showResults();
       }
     }
 
     async function showResults() {
-      try {
-        const resp = await fetch("https://emotion-api-0y8p.onrender.com/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ questions: answers })
-        });
-
-        const data = await resp.json();
-
-        const emotion = data.emotion || "calm";
-        const definition = data.definition || "A peaceful and balanced emotional state.";
-        const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "serene, relaxed, composed";
-
-        document.getElementById("output").innerHTML = `
-          <div class="ai-results">
-            <p><strong>Overall Emotion:</strong> ${emotion}</p>
-            <p><strong>Definition:</strong> ${definition}</p>
-            <p><strong>Synonyms:</strong> ${synonyms}</p>
-          </div>
-        `;
-      } catch (err) {
-        console.warn("AI analysis error:", err);
-
-        document.getElementById("output").innerHTML = `
-          <div class="fallback-results">
-            <p><strong>Something went wrong analyzing your emotions.</strong></p>
-            <p>Fallback emotion: <strong>Calm</strong></p>
-            <p>Definition: A peaceful and balanced emotional state.</p>
-            <p>Synonyms: serene, relaxed, composed</p>
-          </div>
-        `;
-      }
-
-      document.getElementById('results').classList.add('active');
+      document.getElementById("question").classList.remove("active");
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questions: answers })
+      });
+      const data = await res.json();
+      const emotion = data.emotion || "calm";
+      const definition = data.definition || "You feel steady and relaxed.";
+      const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "still, balanced, content";
+      setGradient(emotion);
+      const resultText = `Emotion: ${emotion}\nDefinition: ${definition}\nSynonyms: ${synonyms}`;
+      document.getElementById("output").innerHTML = `
+        <h2>Your Emotional Snapshot</h2>
+        <p><strong>Emotion:</strong> ${emotion}</p>
+        <p><strong>Definition:</strong> ${definition}</p>
+        <p><strong>Synonyms:</strong> ${synonyms}</p>
+        <button onclick=\"location.reload()\">Try Again</button>
+      `;
+      document.getElementById("summary").value = resultText;
+      document.getElementById("output").classList.add("active");
+      document.getElementById("share").classList.add("active");
     }
 
-    function updateProgress(idx, total) {
-      const pct = Math.round(((idx + 1) / (total + 1)) * 100);
-      document.getElementById(idx === 0 ? 'progress-bar' : 'progress-bar-2').style.width = pct + "%";
+    function setGradient(emotion) {
+      const body = document.body;
+      const gradients = {
+        calm: "linear-gradient(120deg, #d0f0fd, #fafff0)",
+        anxious: "linear-gradient(120deg, #ffd6d6, #fffbe6)",
+        excited: "linear-gradient(120deg, #ffefd5, #e0f7fa)",
+        sad: "linear-gradient(120deg, #dfe9f3, #f6f6f6)",
+        angry: "linear-gradient(120deg, #ffcccc, #ffe6e6)"
+      };
+      body.style.background = gradients[emotion] || "linear-gradient(120deg, #f0f8ff, #fffbe6)";
     }
 
-    function showHelp() {
-      alert("Use the slider to show which feeling is stronger for you. Then continue to the next question.");
+    function copySummary() {
+      const textarea = document.getElementById("summary");
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      document.execCommand("copy");
+      alert("Copied to clipboard!");
     }
+
+    loadQuestion(questionBank[currentId]);
   </script>
 </body>
 </html>
