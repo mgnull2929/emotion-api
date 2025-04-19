@@ -6,14 +6,36 @@
   <title>McKFeelings Quiz</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-      background-color: skyblue;
-      transition: background 1s ease;
-    }
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+  background-color: skyblue;
+  transition: background 1s ease;
+}
+
+.progress-container {
+  margin-top: 20px;
+}
+.progress-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: #eee;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-thumb {
+  position: absolute;
+  top: -6px;
+  left: 0;
+  transition: left 0.3s ease;
+}
 
     .step { display: none; }
     .step.active { display: block; }
@@ -71,60 +93,13 @@
     <li>See where you land on an emotion wheel</li>
     <li>Get a one-word emotion, synonyms, and insight</li>
   </ul>
-  <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="startQuiz()">Start Quiz</button>
-</div>
+  $1
 
-
-    <div id="question" class="step">
-      <h2 id="question-text">How pleasant or unpleasant do you feel right now?</h2>
-      <div class="slider-row">
-        <span class="slider-label">Unpleasant</span>
-        <input type="range" id="slider" min="1" max="5" value="3">
-        <span class="slider-label">Pleasant</span>
-      </div>
-      <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="nextQuestion()">Next</button>
+<div class="progress-container" style="margin-top: 30px;">
     </div>
 
-      <div id="emotion-wheel" class="step" style="display: none;">
-  <p style="font-size: 0.9rem; margin-bottom: 10px;">Tap or click near the emotion group that feels closest to how you feel right now.</p>
-  <svg viewBox="0 0 200 200" width="200" height="200">
-    <defs>
-      <linearGradient id="gradTL" x1="0" y1="1" x2="0.5" y2="0.5">
-        <stop offset="0%" stop-color="#ffcccc"/>
-        <stop offset="100%" stop-color="#ff8888"/>
-      </linearGradient>
-      <linearGradient id="gradTR" x1="0.5" y1="0.5" x2="1" y2="1">
-        <stop offset="0%" stop-color="#ffffcc"/>
-        <stop offset="100%" stop-color="#ffff88"/>
-      </linearGradient>
-      <linearGradient id="gradBL" x1="0" y1="0" x2="0.5" y2="0.5">
-        <stop offset="0%" stop-color="#ccccff"/>
-        <stop offset="100%" stop-color="#8888ff"/>
-      </linearGradient>
-      <linearGradient id="gradBR" x1="0.5" y1="0.5" x2="1" y2="0">
-        <stop offset="0%" stop-color="#ccffcc"/>
-        <stop offset="100%" stop-color="#88ff88"/>
-      </linearGradient>
-    </defs>
-    <rect x="0" y="0" width="100" height="100" fill="url(#gradTL)"/>
-    <rect x="100" y="0" width="100" height="100" fill="url(#gradTR)"/>
-    <rect x="0" y="100" width="100" height="100" fill="url(#gradBL)"/>
-    <rect x="100" y="100" width="100" height="100" fill="url(#gradBR)"/>
-    <line x1="0" y1="100" x2="200" y2="100" stroke="#666" stroke-width="1" />
-    <line x1="100" y1="0" x2="100" y2="200" stroke="#666" stroke-width="1" />
-    
-    <rect x="0" y="0" width="200" height="200" fill="transparent" onclick="handleQuadrantClick(event)" onmousemove="handleHover(event)" />
-    <text x="30" y="60" font-size="12" fill="#333">Sad / Numb</text>
-    <text x="130" y="60" font-size="12" fill="#333">Calm / Content</text>
-    <text x="30" y="160" font-size="12" fill="#333">Anxious / Angry</text>
-    <text x="130" y="160" font-size="12" fill="#333">Excited / Happy</text>
-    <text id="hover-label" x="100" y="105" text-anchor="middle" font-size="12" fill="#222"></text>
-    <circle id="dot" cx="100" cy="100" r="5" fill="#000" style="transition: cx 0.5s ease, cy 0.5s ease;" />
-  </svg>
-  <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="handleQuadrantContinue()">Continue</button>
-</div>
-
-<div id="output" class="step" style="display: none;"></div>
+      
+<div id="output" class="step" style="display: none; margin-top: 30px; padding: 20px; background: #fff; border-radius: 12px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); max-width: 100%;"></div>
 
 <script>
 let selectedQuadrant = null;
@@ -137,23 +112,7 @@ const questions = [
   { text: "Is this feeling clear or confusing?", left: "Confusing", right: "Clear", id: "clarity" }
 ];
 
-function handleQuadrantContinue() {
-  if (!selectedQuadrant) return alert("Please click on the quadrant that matches how you feel.");
 
-  if (selectedQuadrant === "Excited / Happy") {
-    questions.push({ text: "Does your excitement feel more like enthusiasm or joy?", left: "Enthusiasm", right: "Joy", id: "excited_branch" });
-  } else if (selectedQuadrant === "Anxious / Angry") {
-    questions.push({ text: "Is it more nervousness or frustration?", left: "Nervous", right: "Frustrated", id: "anxious_branch" });
-  } else if (selectedQuadrant === "Sad / Numb") {
-    questions.push({ text: "Is your sadness closer to hopelessness or emptiness?", left: "Hopeless", right: "Empty", id: "sad_branch" });
-  } else if (selectedQuadrant === "Calm / Content") {
-    questions.push({ text: "Does it feel more like peace or satisfaction?", left: "Peace", right: "Satisfied", id: "calm_branch" });
-  }
-
-  document.getElementById("emotion-wheel").classList.remove("active");
-  document.getElementById("question").classList.add("active");
-  updateQuestion();
-}
 
 function startQuiz() {
   document.getElementById("intro").classList.remove("active");
@@ -162,12 +121,7 @@ function startQuiz() {
     const answers = [];
 
     function nextQuestion() {
-  if (current === 5) {
-    document.getElementById("question").classList.remove("active");
-    document.getElementById("emotion-wheel").style.display = "block";
-    document.getElementById("emotion-wheel").classList.add("active");
-    return;
-  }
+  
   if (current < questions.length) {
     const sliderValue = +document.getElementById("slider").value;
     answers.push({ prompt: questions[current].text, value: sliderValue });
@@ -179,6 +133,8 @@ function startQuiz() {
 }
 
 function updateQuestion() {
+  const progress = (current / questions.length) * 100;
+  document.getElementById("progress-thumb").style.left = `calc(${progress}% - 10px)`;
       const q = questions[current];
       document.getElementById("question-text").textContent = q.text;
       document.querySelectorAll(".slider-label")[0].textContent = q.left;
@@ -202,9 +158,7 @@ function updateQuestion() {
 
       // setGradient(emotion);
 
-      document.getElementById("dot").setAttribute("cx", 40 * (answers[0].value - 1) + 20);
-document.getElementById("dot").setAttribute("cy", 180 - (40 * (answers[1].value - 1)));
-
+      
 document.getElementById("output").innerHTML = `
         <h2>Your Emotional Snapshot</h2>
         <p><strong>Emotion:</strong> ${emotion}</p>
@@ -218,35 +172,7 @@ document.getElementById("output").classList.add("active");
     }
 
     // Background gradient change removed per user preference
-  function handleQuadrantClick(evt) {
-  const rect = evt.target.getBoundingClientRect();
-  const x = evt.clientX - rect.left;
-  const y = evt.clientY - rect.top;
-  const cx = (x / rect.width) * 200;
-  const cy = (y / rect.height) * 200;
-
-  document.getElementById("dot").setAttribute("cx", cx);
-  document.getElementById("dot").setAttribute("cy", cy);
-
-  if (cx > 100 && cy > 100) selectedQuadrant = "Excited / Happy";
-  else if (cx < 100 && cy > 100) selectedQuadrant = "Anxious / Angry";
-  else if (cx < 100 && cy < 100) selectedQuadrant = "Sad / Numb";
-  else if (cx > 100 && cy < 100) selectedQuadrant = "Calm / Content";
-}
-
-function handleHover(evt) {
-  const rect = evt.target.getBoundingClientRect();
-  const x = evt.clientX - rect.left;
-  const y = evt.clientY - rect.top;
-  const cx = (x / rect.width) * 200;
-  const cy = (y / rect.height) * 200;
-  let hoverText = '';
-  if (cx > 100 && cy > 100) hoverText = "Excited / Happy";
-  else if (cx < 100 && cy > 100) hoverText = "Anxious / Angry";
-  else if (cx < 100 && cy < 100) hoverText = "Sad / Numb";
-  else if (cx > 100 && cy < 100) hoverText = "Calm / Content";
-  document.getElementById("hover-label").textContent = hoverText;
-}
+  
 </script>
 
 
