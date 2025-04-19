@@ -63,7 +63,7 @@
 
     #details { margin-top: 1em; }
     .ai-results, .fallback-results { background: #fff; padding: 15px; border-radius: 8px; margin-top: 20px; }
-    .ai-results p { font-size: 1.2rem; text-align: center; }
+    .ai-results p, .fallback-results p { font-size: 1.1rem; text-align: center; }
   </style>
 </head>
 <body>
@@ -179,8 +179,6 @@
     }
 
     async function showResults() {
-      let overallTerm = null;
-
       try {
         const resp = await fetch("https://emotion-api-0y8p.onrender.com/api/analyze", {
           method: "POST",
@@ -189,16 +187,30 @@
         });
 
         const data = await resp.json();
-        overallTerm = data.overall || "(no result)";
+
+        const emotion = data.emotion || "calm";
+        const definition = data.definition || "A peaceful and balanced emotional state.";
+        const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "serene, relaxed, composed";
+
+        document.getElementById("output").innerHTML = `
+          <div class="ai-results">
+            <p><strong>Overall Emotion:</strong> ${emotion}</p>
+            <p><strong>Definition:</strong> ${definition}</p>
+            <p><strong>Synonyms:</strong> ${synonyms}</p>
+          </div>
+        `;
       } catch (err) {
         console.warn("AI analysis error:", err);
-      }
 
-      document.getElementById("output").innerHTML = `
-        <div class="ai-results">
-          <p><strong>Overall Emotion:</strong> ${overallTerm}</p>
-        </div>
-      `;
+        document.getElementById("output").innerHTML = `
+          <div class="fallback-results">
+            <p><strong>Something went wrong analyzing your emotions.</strong></p>
+            <p>Fallback emotion: <strong>Calm</strong></p>
+            <p>Definition: A peaceful and balanced emotional state.</p>
+            <p>Synonyms: serene, relaxed, composed</p>
+          </div>
+        `;
+      }
 
       document.getElementById('results').classList.add('active');
     }

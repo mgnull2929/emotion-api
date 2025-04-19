@@ -39,20 +39,33 @@ app.post("/api/term", async (req, res) => {
 // Full emotion analysis
 app.post("/api/analyze", async (req, res) => {
   const { questions } = req.body;
-  try {
-    const basePrompt = questions.map((q, i) => `Q${i+1}: ${q.prompt} → ${q.value}`).join("\n");
+  const basePrompt = questions.map((q, i) => `Q${i + 1}: ${q.prompt} → ${q.value}`).join("\n");
 
+  const prompt = `
+You are an expert in emotional psychology. Analyze the following slider-based responses and provide:
+
+1. A single-word emotional state that best fits the overall answers.
+2. A plain-language definition of that emotional state.
+3. Three emotional synonyms.
+
+Always give a meaningful result, even if all answers are neutral. In neutral cases, use words like "calm", "centered", "balanced", "reflective", or "content". Never return "unknown", "none", or vague results.
+
+Format your output strictly as valid JSON:
+{
+  "emotion": "emotion word",
+  "definition": "a clear definition",
+  "synonyms": ["syn1", "syn2", "syn3"]
+}
+
+Here are the answers:
+${basePrompt}
+  `;
+
+  try {
     const chat = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        {
-          role: "system",
-          content: `You are an emotion analyst. Based on slider answers, return a combined emotion, its definition, and 3 synonyms. Always return something, even if neutral. Use JSON: {"overall": "emotion", "definition": "text", "synonyms": ["word1", "word2", "word3"]}.`
-        },
-        {
-          role: "user",
-          content: `Answers:\n${basePrompt}`
-        }
+        { role: "user", content: prompt }
       ],
       temperature: 0.5
     });
@@ -60,12 +73,27 @@ app.post("/api/analyze", async (req, res) => {
     const raw = chat.choices[0].message.content.trim();
     const start = raw.indexOf("{");
     const end = raw.lastIndexOf("}");
-    const json = JSON.parse(raw.slice(start, end + 1));
+    const cleanJSON = JSON.parse(raw.slice(start, end + 1));
 
-    res.json(json);
+    // Basic fallback if model somehow returns something unusable
+    const emotion = cleanJSON.emotion?.toLowerCase();
+    if (!emotion || emotion.includes("unknown") || emotion.includes("none")) {
+      return res.json({
+        emotion: "calm",
+        definition: "A peaceful and balanced emotional state.",
+        synonyms: ["serene", "relaxed", "composed"]
+      });
+    }
+
+    res.json(cleanJSON);
   } catch (err) {
     console.error("Analyze error:", err);
-    res.status(500).json({ error: "Failed to analyze emotion", detail: err.message });
+    // Fallback response on failure
+    res.json({
+      emotion: "calm",
+      definition: "A peaceful and balanced emotional state.",
+      synonyms: ["serene", "relaxed", "composed"]
+    });
   }
 });
 
