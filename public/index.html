@@ -46,10 +46,26 @@
       cursor: pointer;
     }
     button {
-      font-family: Arial, sans-serif;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      border-radius: 12px;
-  background: url("Cloud2.png") no-repeat center center;
+  font-family: Arial, sans-serif;
+  border: none;
+  background: transparent;
+  background-image: url("CloudNew.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  width: 180px;
+  aspect-ratio: 3 / 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: bold;
+  font-size: 1rem;
+  text-align: center;
+  text-shadow: 0 0 2px #fff;
+  mix-blend-mode: luminosity;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: brightness(1.1) contrast(1.1);
   background-size: contain;
   border: none;
   color: #000;
@@ -157,7 +173,7 @@
   <div id="intro" class="step active">
     <h2>Emotion Identifier Quiz</h2>
     <p>This quiz helps you pinpoint your current feeling by guiding you through slider-based questions drawn from therapeutic techniques.</p>
-    <button onclick="startQuiz()">Start Quiz</button><br><button onclick="location.reload()" style="margin-top: 10px; font-size: 0.8rem; padding: 10px 20px;">← Restart</button>
+    <button onclick="startQuiz()">Start Quiz</button>
   </div>
 
   <div id="quiz-container" class="step">
@@ -233,8 +249,7 @@
   document.getElementById("left-label").textContent = q.left;
   document.getElementById("right-label").textContent = q.right;
   document.getElementById("slider").value = 3;
-  document.getElementById("slider-value").textContent = "You chose: Neutral";
-  document.getElementById("question").classList.add("fade-in");
+    document.getElementById("question").classList.add("fade-in");
 
   const buttonTintByQuestion = {
     q1: "hue-rotate(180deg)",
@@ -292,7 +307,7 @@
   nextButton.onclick = finalizeResults;
 }
 
-function finalizeResults() {
+async function finalizeResults() {
   const val = answers.find(a => a.prompt.includes("pleasant"))?.value || 3;
   const arousal = answers.find(a => a.prompt.includes("energy"))?.value || 3;
   const control = answers.find(a => a.prompt.includes("control"))?.value || 3;
