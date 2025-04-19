@@ -6,12 +6,12 @@
   <title>McKFeelings Quiz</title>
   <style>
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
       max-width: 600px;
       margin: auto;
-      background-color: #e0f7ff;
+      background-image: url('Background2.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
@@ -19,7 +19,7 @@
     }
     .step { display: none; }
     .step.active { display: block; }
-    h2 { margin-bottom: 10px; font-family: 'Comic Sans MS', cursive, sans-serif; }
+    h2 { margin-bottom: 10px; font-family: Arial, sans-serif; }
     .slider-row {
       display: flex;
       align-items: center;
@@ -46,10 +46,10 @@
       cursor: pointer;
     }
     button {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: Arial, sans-serif;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       border-radius: 12px;
-  background: url("Cloud.png") no-repeat center center;
+  background: url("Cloud2.png") no-repeat center center;
   background-size: contain;
   border: none;
   color: #000;
@@ -77,21 +77,22 @@
       align-items: center;
     }
     textarea {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: Arial, sans-serif;
       width: 100%;
       height: 80px;
       margin-top: 10px;
     }
       @media (max-width: 480px) {
-    .slider-row {
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    .slider-label {
-      width: auto;
-      font-size: 0.9rem;
-    }
+  .slider-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .slider-label {
+    width: auto;
+    font-size: 0.9rem;
+  }
       body {
         padding: 10px;
       }
@@ -112,11 +113,12 @@
       margin: 10px 0;
     }
     .progress-fill {
-      height: 100%;
-      background-color: #4CAF50;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
+  height: 100%;
+  width: 0%;
+  background: url('Car2.png') no-repeat center center;
+  background-size: contain;
+  transition: width 0.3s ease;
+}
     .result-card {
       border: 1px solid #ddd;
       border-radius: 12px;
@@ -151,7 +153,7 @@
   </style>
 </head>
 <body>
-  <h1 style="text-align: center; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 1.4rem; margin-top: 10px; margin-bottom: 5px; text-shadow: 1px 1px 2px #fff;">What are you McKFeeling like today?</h1>
+  <h1 style="text-align: center; font-family: Arial, sans-serif; font-size: 1.4rem; margin-top: 10px; margin-bottom: 5px; text-shadow: 1px 1px 2px #fff;">What are you McKFeeling like today?</h1>
   <div id="intro" class="step active">
     <h2>Emotion Identifier Quiz</h2>
     <p>This quiz helps you pinpoint your current feeling by guiding you through slider-based questions drawn from therapeutic techniques.</p>
@@ -163,12 +165,18 @@
       <div class="progress-bar"><div class="progress-fill" id="progress-bar"></div></div>
       <div class="step-count" id="step-count"></div>
       <h2 id="question-text"></h2>
-      <div class="slider-row" style="flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center;">
+      <div class="slider-row" style="flex-wrap: nowrap; gap: 12px; justify-content: space-between; align-items: center;">
   <span class="slider-label" id="left-label">Unpleasant</span>
-  <input id="slider" type="range" min="1" max="5" step="1" value="3" aria-label="How strongly do you feel on this scale?" style="flex-grow: 1; margin: 0 10px;" />
+  <input id="slider" type="range" min="1" max="5" step="1" value="3" aria-label="Feeling scale" style="width: 60%; margin: 0 10px; background: transparent;" list="tickmarks">
   <span class="slider-label" id="right-label">Pleasant</span>
 </div>
-<div class="slider-value" id="slider-value">You chose: Neutral</div>
+<datalist id="tickmarks">
+  <option value="1"></option>
+  <option value="2"></option>
+  <option value="3"></option>
+  <option value="4"></option>
+  <option value="5"></option>
+</datalist>
       <button onclick="nextQuestion()">Next</button>
     </div>
     <div id="output" class="step" style="display: none;"></div>
@@ -190,44 +198,30 @@
     }
 
     const questionBank = {
-      q1: {
-        id: "q1",
-        text: "Thinking about how you feel right now, how pleasant or unpleasant is your current experience?",
-        left: "Unpleasant",
-        right: "Pleasant",
-        next: (val) => val <= 2 ? "q2_low" : val >= 4 ? "q2_high" : "q2_mid"
-      },
-      q2_low: {
-        id: "q2_low",
-        text: "In this moment, does your low energy feel more like tiredness or sadness?",
-        left: "Tired",
-        right: "Sad",
-        next: () => "q3"
-      },
-      q2_mid: {
-        id: "q2_mid",
-        text: "As you reflect on today, are you feeling more grounded or more scattered in focus?",
-        left: "Stable",
-        right: "Distracted",
-        next: () => "q3"
-      },
-      q2_high: {
-        id: "q2_high",
-        text: "When you think about your current good mood, does it feel more joyful or more excited?",
-        left: "Joyful",
-        right: "Excited",
-        next: () => "q3"
-      },
-      q3: {
-        id: "q3",
-        text: "Right now, how energized or activated do you feel in your body and mind?",
-        left: "Deactivated",
-        right: "Activated",
-        next: () => null
-      }
-    };
+  valence: {
+    id: "valence",
+    text: "How pleasant or unpleasant is your mood right now?",
+    left: "😢 Unpleasant",
+    right: "😊 Pleasant",
+    next: () => "arousal"
+  },
+  arousal: {
+    id: "arousal",
+    text: "How much energy do you feel in your body right now?",
+    left: "😴 Low energy",
+    right: "⚡ High energy",
+    next: () => "control"
+  },
+  control: {
+    id: "control",
+    text: "Do you feel in control or overwhelmed?",
+    left: "😖 Overwhelmed",
+    right: "💪 In control",
+    next: () => null
+  }
+};
 
-    let currentId = "q1";
+    let currentId = "valence";
     const answers = [];
 
     function loadQuestion(q) {
@@ -275,6 +269,53 @@
     }
 
     async function showResults() {
+  const val = answers.find(a => a.prompt.includes("pleasant"))?.value || 3;
+  const arousal = answers.find(a => a.prompt.includes("energy"))?.value || 3;
+  const control = answers.find(a => a.prompt.includes("control"))?.value || 3;
+
+  const intensityPrompt = {
+    prompt: "How strong is this feeling right now?",
+    value: null
+  };
+  answers.push(intensityPrompt);
+
+  document.getElementById("question-text").textContent = intensityPrompt.prompt;
+  document.getElementById("left-label").textContent = "Mild";
+  document.getElementById("right-label").textContent = "Overwhelming";
+  document.getElementById("slider").value = 3;
+
+  document.querySelector("#question").classList.add("active");
+  currentId = "intensity";
+  document.getElementById("step-count").textContent = "Step 4 of 4";
+  updateProgress(currentId);
+
+  const nextButton = document.querySelector("#question button");
+  nextButton.onclick = finalizeResults;
+}
+
+function finalizeResults() {
+  const val = answers.find(a => a.prompt.includes("pleasant"))?.value || 3;
+  const arousal = answers.find(a => a.prompt.includes("energy"))?.value || 3;
+  const control = answers.find(a => a.prompt.includes("control"))?.value || 3;
+  const intensity = +document.getElementById("slider").value;
+  answers[answers.length - 1].value = intensity;
+
+  let emotion = "calm";
+  if (val <= 2 && arousal >= 4 && control <= 2) emotion = "anxious";
+  else if (val <= 2 && arousal >= 4 && control >= 4) emotion = "angry";
+  else if (val <= 2 && arousal <= 2) emotion = "sad";
+  else if (val >= 4 && arousal >= 4) emotion = "excited";
+  else if (val >= 4 && arousal <= 3) emotion = "content";
+  else if (val <= 2 && control <= 2 && arousal <= 3) emotion = "numb";
+  else if (val <= 2 && control >= 3 && arousal === 3) emotion = "bored";
+  if (val <= 2 && arousal >= 4 && control <= 2) emotion = "anxious";
+  else if (val <= 2 && arousal >= 4 && control >= 4) emotion = "angry";
+  else if (val <= 2 && arousal <= 2) emotion = "sad";
+  else if (val >= 4 && arousal >= 4) emotion = "excited";
+  else if (val >= 4 && arousal <= 3) emotion = "content";
+  else if (val <= 2 && control <= 2 && arousal <= 3) emotion = "numb";
+  else if (val <= 2 && control >= 3 && arousal === 3) emotion = "bored";
+
   document.getElementById("question").classList.remove("active");
   const res = await fetch("/api/analyze", {
     method: "POST",
@@ -287,7 +328,9 @@
   const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "still, balanced, content";
   const resultText = `Emotion: ${emotion}
 Definition: ${definition}
-Synonyms: ${synonyms}`;
+Synonyms: ${synonyms}
+Intensity: ${intensity}/5
+Quadrant: ${getEmotionQuadrant(val, arousal, control)}`;
   const emojiMap = {
     calm: "🧘",
     anxious: "😰",
@@ -309,6 +352,8 @@ Synonyms: ${synonyms}`;
     <p><strong>Emotion:</strong> ${emoji} ${emotion}</p>
     <p><strong>Definition:</strong> ${definition}</p>
     <p><strong>Synonyms:</strong> ${synonyms}</p>
+    <p><strong>Intensity:</strong> ${intensity}/5</p>
+    <p><strong>Quadrant:</strong> ${getEmotionQuadrant(val, arousal, control)}</p>
     <p><em>${getEmotionInsight(emotion)}</em></p>
     <button onclick="location.reload()" style="margin-top: 20px;">Try Again</button>
   </div>`;
@@ -357,24 +402,26 @@ function copySummary() {
     }
   function getStepLabel(id) {
   const map = {
-    q1: "Step 1 of 3",
-    q2_low: "Step 2 of 3",
-    q2_mid: "Step 2 of 3",
-    q2_high: "Step 2 of 3",
-    q3: "Step 3 of 3"
+    valence: "Step 1 of 3",
+    arousal: "Step 2 of 3",
+    control: "Step 3 of 3"
   };
   return map[id] || "";
 }
 function updateProgress(id) {
   const map = {
-    q1: 33,
-    q2_low: 66,
-    q2_mid: 66,
-    q2_high: 66,
-    q3: 100
+    valence: 33,
+    arousal: 66,
+    control: 100
   };
   const pct = map[id] || 0;
   document.getElementById("progress-bar").style.width = pct + "%";
+}
+function getEmotionQuadrant(val, arousal, control) {
+  const valLabel = val <= 2 ? "negative" : val >= 4 ? "positive" : "neutral";
+  const arousalLabel = arousal <= 2 ? "low-energy" : arousal >= 4 ? "high-energy" : "moderate-energy";
+  const controlLabel = control <= 2 ? "low-control" : control >= 4 ? "high-control" : "moderate-control";
+  return `${arousalLabel}, ${controlLabel}, ${valLabel} emotion`;
 }
 </script>
 </body>
