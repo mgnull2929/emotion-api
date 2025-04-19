@@ -310,9 +310,8 @@ Synonyms: ${synonyms}`;
     <p><strong>Definition:</strong> ${definition}</p>
     <p><strong>Synonyms:</strong> ${synonyms}</p>
     <p><em>${getEmotionInsight(emotion)}</em></p>
-  </div>
-  <button onclick="location.reload()">Try Again</button>`
-  `;
+    <button onclick="location.reload()" style="margin-top: 20px;">Try Again</button>
+  </div>`;
   document.getElementById("summary").value = resultText;
   document.getElementById("output").style.display = "block";
   document.getElementById("share").style.display = "flex";
