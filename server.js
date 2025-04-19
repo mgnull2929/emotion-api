@@ -4,40 +4,46 @@ import cors    from "cors";
 import dotenv  from "dotenv";
 import OpenAI  from "openai";
 
-// 1. Load your .env
 dotenv.config();
 
-// 2. Create and configure Express
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public")); // ← this line serves index.html from /public
+app.use(express.static("public"));
 
-
-
-
-
-// 3. Initialize OpenAI client
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// 4. Define your endpoint
-app.post("/api/term", async (req, res) => {
-  const { question, value } = req.body;
+app.post("/api/analyze", async (req, res) => {
+  const { answers } = req.body;
+
   try {
+    const questionsFormatted = Object.entries(answers)
+      .map(([key, val]) => `${key}: ${val}`)
+      .join("\n");
+
+    const prompt = `
+You are a clinical psychologist. Based on the user's answers below, infer a single emotional state the user might be experiencing. 
+Be concise and give one primary emotion as your final answer. Do not explain or add extra text.
+
+Answers:
+${questionsFormatted}
+`;
+
     const chat = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You’re a therapist. Give one adjective." },
-        { role: "user",   content: `Answer ${value} for: "${question}".` }
+        { role: "system", content: "You are a psychologist. Your job is to identify emotional states." },
+        { role: "user", content: prompt }
       ]
     });
-    res.json({ term: chat.choices[0].message.content.trim() });
+
+    const emotion = chat.choices[0].message.content.trim();
+    res.json({ emotion });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// 5. Start listening
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`API listening on http://localhost:${PORT}`));
