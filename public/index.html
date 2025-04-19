@@ -62,12 +62,7 @@
     .progress-fill { width: 0%; height: 100%; background-color: #4CAF50; border-radius: 5px; transition: width 0.3s ease; }
 
     #details { margin-top: 1em; }
-    .ai-results, .fallback-results {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
+    .ai-results, .fallback-results { background: #fff; padding: 15px; border-radius: 8px; margin-top: 20px; }
     .ai-results p { font-size: 1.2rem; text-align: center; }
   </style>
 </head>
@@ -132,7 +127,7 @@
     ];
 
     let currentBranch = [], stepIndex = 0;
-    const answers = {};
+    const answers = [];
 
     function startQuiz() {
       document.getElementById('intro').classList.remove('active');
@@ -142,8 +137,9 @@
 
     function handleFirst() {
       const val = +document.getElementById('slider0').value;
-      answers["Q1"] = { prompt: "Self-directed vs Other-directed", value: val };
-      currentBranch = val >= 3 ? branchB : branchA;
+      const branch = val >= 3 ? branchB : branchA;
+      currentBranch = branch;
+      answers.push({ prompt: "Self-directed vs Other-directed", value: val });
       document.getElementById('step0').classList.remove('active');
       stepIndex = 0;
       showAdaptive();
@@ -171,7 +167,7 @@
     async function nextAdaptive() {
       const val = +document.getElementById('slider').value;
       const q = currentBranch[stepIndex];
-      answers[`Q${stepIndex+2}`] = { prompt: q.prompt, value: val };
+      answers.push({ prompt: q.prompt, value: val });
 
       document.getElementById('question-step').classList.remove('active');
       if (stepIndex < currentBranch.length - 1) {
@@ -183,31 +179,27 @@
     }
 
     async function showResults() {
-      const questionInputs = Object.entries(answers).map(([k, v]) => ({
-        prompt: v.prompt,
-        value: v.value
-      }));
-
       let overallTerm = null;
+
       try {
         const resp = await fetch("https://emotion-api-0y8p.onrender.com/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ questions: questionInputs })
+          body: JSON.stringify({ questions: answers })
         });
+
         const data = await resp.json();
-        overallTerm = data.overall;
+        overallTerm = data.overall || "(no result)";
       } catch (err) {
-        console.warn("AI analyze error:", err);
+        console.warn("AI analysis error:", err);
       }
 
-      let resultHTML = `<p><strong>Overall Emotion:</strong> ${overallTerm || "Unknown"}</p><ul>`;
-      questionInputs.forEach((q, i) => {
-        resultHTML += `<li>Q${i + 1} (${q.prompt}): Chose ${q.value}</li>`;
-      });
-      resultHTML += `</ul>`;
+      document.getElementById("output").innerHTML = `
+        <div class="ai-results">
+          <p><strong>Overall Emotion:</strong> ${overallTerm}</p>
+        </div>
+      `;
 
-      document.getElementById('output').innerHTML = `<div class="ai-results">${resultHTML}</div>`;
       document.getElementById('results').classList.add('active');
     }
 
