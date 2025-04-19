@@ -11,25 +11,25 @@
       padding: 20px;
       max-width: 600px;
       margin: auto;
-      background-image: url('Background2.png');
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
+      background-color: skyblue;
       transition: background 1s ease;
     }
+
     .step { display: none; }
     .step.active { display: block; }
-    h2 { margin-bottom: 10px; font-family: Arial, sans-serif; }
+
+    h2 { margin-bottom: 10px; }
+
     .slider-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin: 20px 0;
     }
+
     .slider-label { width: 120px; text-align: center; }
+
     input[type=range] {
-      -webkit-appearance: none;
-      appearance: none;
       width: 100%;
       height: 6px;
       background: #ddd;
@@ -37,48 +37,22 @@
       outline: none;
       margin: 0 10px;
     }
+
     input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
       width: 16px;
       height: 16px;
       background: #4CAF50;
       border-radius: 50%;
       cursor: pointer;
     }
+
     button {
-  font-family: Arial, sans-serif;
-  border: none;
-  background: transparent;
-  background-image: url("CloudNew.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-  width: 180px;
-  aspect-ratio: 3 / 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #000;
-  font-weight: bold;
-  font-size: 1rem;
-  text-align: center;
-  text-shadow: 0 0 2px #fff;
-  mix-blend-mode: luminosity;
-  transition: transform 0.3s ease, filter 0.3s ease;
-  filter: brightness(1.1) contrast(1.1);
-  background-size: contain;
-  border: none;
-  color: #000;
-  font-weight: bold;
-  font-size: 1rem;
-  
-  cursor: pointer;
-  text-align: center;
-  text-shadow: 0 0 2px #fff;
-  mix-blend-mode: luminosity;
-  transition: filter 0.3s ease;
-  filter: brightness(1.1) contrast(1.1);
-}
+      padding: 12px 24px;
+      margin-top: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
     #output {
       margin-top: 30px;
       padding: 20px;
@@ -86,352 +60,183 @@
       border-radius: 8px;
       text-align: center;
     }
-    #share {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    textarea {
-      font-family: Arial, sans-serif;
-      width: 100%;
-      height: 80px;
-      margin-top: 10px;
-    }
-      @media (max-width: 480px) {
-  .slider-row {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .slider-label {
-    width: auto;
-    font-size: 0.9rem;
-  }
-      body {
-        padding: 10px;
-      }
-      button {
-        
-        font-size: 0.9rem;
-      }
-      h1 {
-        font-size: 1.5rem;
-      }
-    }
-    .progress-bar {
-      width: 100%;
-      height: 10px;
-      background-color: #eee;
-      border-radius: 5px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
-    .progress-fill {
-  height: 100%;
-  width: 0%;
-  background: url('Car2.png') no-repeat center center;
-  background-size: contain;
-  transition: width 0.3s ease;
-}
-    .result-card {
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      background: #fefefe;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-  .slider-value {
-      text-align: center;
-      font-size: 0.9rem;
-      color: #333;
-      margin-top: -10px;
-      margin-bottom: 10px;
-    }
-    .fade-in {
-      animation: fadeIn 0.6s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    button:hover {
-      transform: scale(1.05);
-      filter: brightness(1.15);
-    }
-    .step-count {
-      text-align: center;
-      font-size: 0.95rem;
-      color: #222;
-      margin-bottom: 8px;
-    }
   </style>
 </head>
 <body>
-  <h1 style="text-align: center; font-family: Arial, sans-serif; font-size: 1.4rem; margin-top: 10px; margin-bottom: 5px; text-shadow: 1px 1px 2px #fff;">What are you McKFeeling like today?</h1>
   <div id="intro" class="step active">
-    <h2>Emotion Identifier Quiz</h2>
-    <p>This quiz helps you pinpoint your current feeling by guiding you through slider-based questions drawn from therapeutic techniques.</p>
-    <button onclick="startQuiz()">Start Quiz</button>
-  </div>
-
-  <div id="quiz-container" class="step">
-    <div id="question" class="fade-in">
-      <div class="progress-bar"><div class="progress-fill" id="progress-bar"></div></div>
-      <div class="step-count" id="step-count"></div>
-      <h2 id="question-text"></h2>
-      <div class="slider-row" style="flex-wrap: nowrap; gap: 12px; justify-content: space-between; align-items: center;">
-  <span class="slider-label" id="left-label">Unpleasant</span>
-  <input id="slider" type="range" min="1" max="5" step="1" value="3" aria-label="Feeling scale" style="width: 60%; margin: 0 10px; background: transparent;" list="tickmarks">
-  <span class="slider-label" id="right-label">Pleasant</span>
+  <h1>What are you McKFeeling today?</h1>
+  <p>This quiz helps you identify your current emotional state using science-backed questions.</p>
+  <ul>
+    <li>Answer slider-based questions</li>
+    <li>See where you land on an emotion wheel</li>
+    <li>Get a one-word emotion, synonyms, and insight</li>
+  </ul>
+  <button onclick="startQuiz()">Start Quiz</button>
 </div>
-<datalist id="tickmarks">
-  <option value="1"></option>
-  <option value="2"></option>
-  <option value="3"></option>
-  <option value="4"></option>
-  <option value="5"></option>
-</datalist>
+
+
+    <div id="question" class="step active">
+      <h2 id="question-text">How pleasant or unpleasant do you feel right now?</h2>
+      <div class="slider-row">
+        <span class="slider-label">Unpleasant</span>
+        <input type="range" id="slider" min="1" max="5" value="3">
+        <span class="slider-label">Pleasant</span>
+      </div>
       <button onclick="nextQuestion()">Next</button>
     </div>
-    <div id="output" class="step" style="display: none;"></div>
-    <div id="share" class="step" style="display: none;">
-      <h3>Share or Save Your Result</h3>
-      <textarea id="summary" readonly></textarea>
-      <button onclick="copySummary()">Copy to Clipboard</button>
-    </div>
+
+      <p style="font-size: 0.9rem; margin-bottom: 10px;">Tap or click near the emotion group that feels closest to how you feel right now.</p>
+  <svg viewBox="0 0 200 200" width="200" height="200">
+    <defs>
+      <linearGradient id="gradTL" x1="0" y1="1" x2="0.5" y2="0.5">
+        <stop offset="0%" stop-color="#ffcccc"/>
+        <stop offset="100%" stop-color="#ff8888"/>
+      </linearGradient>
+      <linearGradient id="gradTR" x1="0.5" y1="0.5" x2="1" y2="1">
+        <stop offset="0%" stop-color="#ffffcc"/>
+        <stop offset="100%" stop-color="#ffff88"/>
+      </linearGradient>
+      <linearGradient id="gradBL" x1="0" y1="0" x2="0.5" y2="0.5">
+        <stop offset="0%" stop-color="#ccccff"/>
+        <stop offset="100%" stop-color="#8888ff"/>
+      </linearGradient>
+      <linearGradient id="gradBR" x1="0.5" y1="0.5" x2="1" y2="0">
+        <stop offset="0%" stop-color="#ccffcc"/>
+        <stop offset="100%" stop-color="#88ff88"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="100" height="100" fill="url(#gradTL)"/>
+    <rect x="100" y="0" width="100" height="100" fill="url(#gradTR)"/>
+    <rect x="0" y="100" width="100" height="100" fill="url(#gradBL)"/>
+    <rect x="100" y="100" width="100" height="100" fill="url(#gradBR)"/>
+    <line x1="0" y1="100" x2="200" y2="100" stroke="#666" stroke-width="1" />
+    <line x1="100" y1="0" x2="100" y2="200" stroke="#666" stroke-width="1" />
+    $1
+    <rect x="0" y="0" width="200" height="200" fill="transparent" onclick="handleQuadrantClick(event)" onmousemove="handleHover(event)" />
+    <text x="30" y="60" font-size="12" fill="#333">Sad / Numb</text>
+    <text x="130" y="60" font-size="12" fill="#333">Calm / Content</text>
+    <text x="30" y="160" font-size="12" fill="#333">Anxious / Angry</text>
+    <text x="130" y="160" font-size="12" fill="#333">Excited / Happy</text>
+  <text id="hover-label" x="100" y="105" text-anchor="middle" font-size="12" fill="#222"></text>
+</svg>
+  <button onclick="handleQuadrantContinue()">Continue</button>
+</div>
   </div>
 
-  <script>
-    function startQuiz() {
-      document.getElementById("intro").classList.remove("active");
-      document.getElementById("quiz-container").classList.add("active");
-      document.getElementById("question").classList.add("fade-in");
-  document.getElementById("step-count").textContent = getStepLabel(currentId);
-  updateProgress(currentId);
-  loadQuestion(questionBank[currentId]);
-    }
+  $1
 
-    const questionBank = {
-  valence: {
-    id: "valence",
-    text: "How pleasant or unpleasant is your mood right now?",
-    left: "😢 Unpleasant",
-    right: "😊 Pleasant",
-    next: () => "arousal"
-  },
-  arousal: {
-    id: "arousal",
-    text: "How much energy do you feel in your body right now?",
-    left: "😴 Low energy",
-    right: "⚡ High energy",
-    next: () => "control"
-  },
-  control: {
-    id: "control",
-    text: "Do you feel in control or overwhelmed?",
-    left: "😖 Overwhelmed",
-    right: "💪 In control",
-    next: () => null
+let selectedQuadrant = null;
+let current = 0;
+const questions = [];
+
+function handleQuadrantContinue() {
+  if (!selectedQuadrant) return alert("Please click on the quadrant that matches how you feel.");
+
+  if (selectedQuadrant === "Excited / Happy") {
+    questions.push({ text: "Does your excitement feel more like enthusiasm or joy?", left: "Enthusiasm", right: "Joy", id: "excited_branch" });
+  } else if (selectedQuadrant === "Anxious / Angry") {
+    questions.push({ text: "Is it more nervousness or frustration?", left: "Nervous", right: "Frustrated", id: "anxious_branch" });
+  } else if (selectedQuadrant === "Sad / Numb") {
+    questions.push({ text: "Is your sadness closer to hopelessness or emptiness?", left: "Hopeless", right: "Empty", id: "sad_branch" });
+  } else if (selectedQuadrant === "Calm / Content") {
+    questions.push({ text: "Does it feel more like peace or satisfaction?", left: "Peace", right: "Satisfied", id: "calm_branch" });
   }
-};
 
-    let currentId = "valence";
-    const answers = [];
-
-    function loadQuestion(q) {
-  const qEl = document.getElementById("question");
-  qEl.classList.remove("fade-in");
-  void qEl.offsetWidth;
-  qEl.classList.add("fade-in");
-  document.getElementById("question-text").textContent = q.text;
-  document.getElementById("left-label").textContent = q.left;
-  document.getElementById("right-label").textContent = q.right;
-  document.getElementById("slider").value = 3;
-    document.getElementById("question").classList.add("fade-in");
-
-  const buttonTintByQuestion = {
-    q1: "hue-rotate(180deg)",
-    q2_low: "hue-rotate(0deg) brightness(1.1)",
-    q2_mid: "hue-rotate(60deg)",
-    q2_high: "hue-rotate(90deg)",
-    q3: "hue-rotate(240deg)"
-  };
-
-  const buttons = document.querySelectorAll("button");
-  buttons.forEach(btn => {
-    btn.style.filter = buttonTintByQuestion[q.id] || "none";
-  });
+  document.getElementById("emotion-wheel").classList.remove("active");
+  document.getElementById("question").classList.add("active");
+  updateQuestion();
 }
 
-    function nextQuestion() {
-  document.getElementById("step-count").textContent = getStepLabel(currentId);
-  document.getElementById("question").classList.remove("fade-in");
-      const sliderValue = +document.getElementById("slider").value;
-      const labelMap = ["Very left", "Left", "Neutral", "Right", "Very right"];
-            const current = questionBank[currentId];
-      answers.push({ prompt: current.text, value: sliderValue });
-      const nextId = typeof current.next === "function" ? current.next(sliderValue) : null;
+function startQuiz() {
+  document.getElementById("intro").classList.remove("active");
+  document.getElementById("question").classList.add("active");
+}
+    const answers = [];
 
-      if (nextId && questionBank[nextId]) {
-        currentId = nextId;
-        loadQuestion(questionBank[currentId]);
+    function nextQuestion() {
+      const sliderValue = document.getElementById("slider").value;
+      answers.push({ prompt: questions[current].text, value: +sliderValue });
+
+      // Adaptive logic placeholder (can branch later)
+      current++;
+
+      if (current < questions.length) {
+        updateQuestion();
       } else {
         showResults();
       }
     }
 
+    function updateQuestion() {
+      const q = questions[current];
+      document.getElementById("question-text").textContent = q.text;
+      document.querySelectorAll(".slider-label")[0].textContent = q.left;
+      document.querySelectorAll(".slider-label")[1].textContent = q.right;
+      document.getElementById("slider").value = 3;
+    }
+
     async function showResults() {
-  const val = answers.find(a => a.prompt.includes("pleasant"))?.value || 3;
-  const arousal = answers.find(a => a.prompt.includes("energy"))?.value || 3;
-  const control = answers.find(a => a.prompt.includes("control"))?.value || 3;
+      document.getElementById("question").classList.remove("active");
 
-  const intensityPrompt = {
-    prompt: "How strong is this feeling right now?",
-    value: null
-  };
-  answers.push(intensityPrompt);
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ questions: answers })
+      });
 
-  document.getElementById("question-text").textContent = intensityPrompt.prompt;
-  document.getElementById("left-label").textContent = "Mild";
-  document.getElementById("right-label").textContent = "Overwhelming";
-  document.getElementById("slider").value = 3;
+      const data = await res.json();
+      const emotion = data.emotion || "calm";
+      const definition = data.definition || "You feel steady and relaxed.";
+      const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "still, balanced, content";
 
-  document.querySelector("#question").classList.add("active");
-  currentId = "intensity";
-  document.getElementById("step-count").textContent = "Step 4 of 4";
-  updateProgress(currentId);
+      // setGradient(emotion);
 
-  const nextButton = document.querySelector("#question button");
-  nextButton.onclick = finalizeResults;
-}
+      document.getElementById("dot").setAttribute("cx", 40 * (answers[0].value - 1) + 20);
+document.getElementById("dot").setAttribute("cy", 180 - (40 * (answers[1].value - 1)));
 
-async function finalizeResults() {
-  const val = answers.find(a => a.prompt.includes("pleasant"))?.value || 3;
-  const arousal = answers.find(a => a.prompt.includes("energy"))?.value || 3;
-  const control = answers.find(a => a.prompt.includes("control"))?.value || 3;
-  const intensity = +document.getElementById("slider").value;
-  answers[answers.length - 1].value = intensity;
+document.getElementById("output").innerHTML = `
+        <h2>Your Emotional Snapshot</h2>
+        <p><strong>Emotion:</strong> ${emotion}</p>
+        <p><strong>Definition:</strong> ${definition}</p>
+        <p><strong>Synonyms:</strong> ${synonyms}</p>
+        <button onclick="location.reload()">Try Again</button>
+      `;
 
-  let emotion = "calm";
-  if (val <= 2 && arousal >= 4 && control <= 2) emotion = "anxious";
-  else if (val <= 2 && arousal >= 4 && control >= 4) emotion = "angry";
-  else if (val <= 2 && arousal <= 2) emotion = "sad";
-  else if (val >= 4 && arousal >= 4) emotion = "excited";
-  else if (val >= 4 && arousal <= 3) emotion = "content";
-  else if (val <= 2 && control <= 2 && arousal <= 3) emotion = "numb";
-  else if (val <= 2 && control >= 3 && arousal === 3) emotion = "bored";
-
-  document.getElementById("question").classList.remove("active");
-  const res = await fetch("/api/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ questions: answers })
-  });
-  const data = await res.json();
-  emotion = data.emotion || "calm";
-  const definition = data.definition || "You feel steady and relaxed.";
-  const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "still, balanced, content";
-  const resultText = `Emotion: ${emotion}
-Definition: ${definition}
-Synonyms: ${synonyms}
-Intensity: ${intensity}/5
-Quadrant: ${getEmotionQuadrant(val, arousal, control)}`;
-  const emojiMap = {
-    calm: "🧘",
-    anxious: "😰",
-    excited: "😄",
-    sad: "😢",
-    angry: "😠",
-    numb: "😶",
-    content: "😊",
-    happy: "😃",
-    reflective: "🪞",
-    bored: "😐",
-    hopeful: "🌤️",
-    discouraged: "😞"
-  };
-  const emoji = emojiMap[emotion] || "🙂";
-  document.getElementById("output").innerHTML = `
-  <div class="result-card">
-    <h2>Your Emotional Snapshot</h2>
-    <p><strong>Emotion:</strong> ${emoji} ${emotion}</p>
-    <p><strong>Definition:</strong> ${definition}</p>
-    <p><strong>Synonyms:</strong> ${synonyms}</p>
-    <p><strong>Intensity:</strong> ${intensity}/5</p>
-    <p><strong>Quadrant:</strong> ${getEmotionQuadrant(val, arousal, control)}</p>
-    <p><em>${getEmotionInsight(emotion)}</em></p>
-    <button onclick="location.reload()" style="margin-top: 20px;">Try Again</button>
-  </div>`;
-  document.getElementById("summary").value = resultText;
-  document.getElementById("output").style.display = "block";
-  document.getElementById("share").style.display = "flex";
-
-  // Set button tint based on emotion
-  const buttons = document.querySelectorAll("button");
-  const tintMap = {
-    calm: "hue-rotate(180deg)",
-    anxious: "hue-rotate(0deg) brightness(1.1)",
-    excited: "hue-rotate(60deg)",
-    sad: "hue-rotate(220deg)",
-    angry: "hue-rotate(330deg) brightness(1.2)"
-  };
-  buttons.forEach(btn => {
-    btn.style.filter = tintMap[emotion] || "none";
-  });
+      document.getElementById("output").classList.add("active");
     }
 
-    function getEmotionInsight(emotion) {
-  const insights = {
-    calm: "Calm often means your body feels safe and your environment feels predictable.",
-    anxious: "Anxiety can signal uncertainty or unmet needs for safety or clarity.",
-    excited: "Excitement often arises when you're anticipating something joyful or novel.",
-    sad: "Sadness may appear when something important feels lost or missing.",
-    angry: "Anger often reflects a boundary crossed or a need for justice.",
-    numb: "Numbness can be your mind's way of shielding from overwhelm.",
-    content: "Contentment comes from having your basic emotional needs met.",
-    happy: "Happiness can reflect alignment between your actions and values.",
-    reflective: "Reflectiveness shows openness to insight and inner exploration.",
-    bored: "Boredom might mean your curiosity or engagement needs attention.",
-    hopeful: "Hope points to possibility and belief in change.",
-    discouraged: "Discouragement may show up when effort isn't met with progress."
-  };
-  return insights[emotion] || "Your emotion gives clues about what matters to you.";
+    // Background gradient change removed per user preference
+  function handleQuadrantClick(evt) {
+  const rect = evt.target.getBoundingClientRect();
+  const x = evt.clientX - rect.left;
+  const y = evt.clientY - rect.top;
+  const cx = (x / rect.width) * 200;
+  const cy = (y / rect.height) * 200;
+
+  document.getElementById("dot").setAttribute("cx", cx);
+  document.getElementById("dot").setAttribute("cy", cy);
+
+  if (cx > 100 && cy > 100) selectedQuadrant = "Excited / Happy";
+  else if (cx < 100 && cy > 100) selectedQuadrant = "Anxious / Angry";
+  else if (cx < 100 && cy < 100) selectedQuadrant = "Sad / Numb";
+  else if (cx > 100 && cy < 100) selectedQuadrant = "Calm / Content";
 }
 
-function copySummary() {
-      const textarea = document.getElementById("summary");
-      textarea.select();
-      textarea.setSelectionRange(0, 99999);
-      document.execCommand("copy");
-      alert("Copied to clipboard!");
-    }
-  function getStepLabel(id) {
-  const map = {
-    valence: "Step 1 of 4",
-    arousal: "Step 2 of 4",
-    control: "Step 3 of 4",
-    intensity: "Step 4 of 4"
-  };
-  return map[id] || "";
+function handleHover(evt) {
+  const rect = evt.target.getBoundingClientRect();
+  const x = evt.clientX - rect.left;
+  const y = evt.clientY - rect.top;
+  const cx = (x / rect.width) * 200;
+  const cy = (y / rect.height) * 200;
+  let hoverText = '';
+  if (cx > 100 && cy > 100) hoverText = "Excited / Happy";
+  else if (cx < 100 && cy > 100) hoverText = "Anxious / Angry";
+  else if (cx < 100 && cy < 100) hoverText = "Sad / Numb";
+  else if (cx > 100 && cy < 100) hoverText = "Calm / Content";
+  document.getElementById("hover-label").textContent = hoverText;
 }
-function updateProgress(id) {
-  const map = {
-    valence: 25,
-    arousal: 50,
-    control: 75,
-    intensity: 100
-  };
-  const pct = map[id] || 0;
-  document.getElementById("progress-bar").style.width = pct + "%";
-}
-function getEmotionQuadrant(val, arousal, control) {
-  const valLabel = val <= 2 ? "negative" : val >= 4 ? "positive" : "neutral";
-  const arousalLabel = arousal <= 2 ? "low-energy" : arousal >= 4 ? "high-energy" : "moderate-energy";
-  const controlLabel = control <= 2 ? "low-control" : control >= 4 ? "high-control" : "moderate-control";
-  return `${arousalLabel}, ${controlLabel}, ${valLabel} emotion`;
-}
-</script>
+
+$1
+<div id="output" class="step"></div>
 </body>
 </html>
