@@ -255,8 +255,7 @@
   document.getElementById("question").classList.remove("fade-in");
       const sliderValue = +document.getElementById("slider").value;
       const labelMap = ["Very left", "Left", "Neutral", "Right", "Very right"];
-      document.getElementById("slider-value").textContent = `You chose: ${labelMap[sliderValue - 1]}`;
-      const current = questionBank[currentId];
+            const current = questionBank[currentId];
       answers.push({ prompt: current.text, value: sliderValue });
       const nextId = typeof current.next === "function" ? current.next(sliderValue) : null;
 
@@ -308,13 +307,6 @@ function finalizeResults() {
   else if (val >= 4 && arousal <= 3) emotion = "content";
   else if (val <= 2 && control <= 2 && arousal <= 3) emotion = "numb";
   else if (val <= 2 && control >= 3 && arousal === 3) emotion = "bored";
-  if (val <= 2 && arousal >= 4 && control <= 2) emotion = "anxious";
-  else if (val <= 2 && arousal >= 4 && control >= 4) emotion = "angry";
-  else if (val <= 2 && arousal <= 2) emotion = "sad";
-  else if (val >= 4 && arousal >= 4) emotion = "excited";
-  else if (val >= 4 && arousal <= 3) emotion = "content";
-  else if (val <= 2 && control <= 2 && arousal <= 3) emotion = "numb";
-  else if (val <= 2 && control >= 3 && arousal === 3) emotion = "bored";
 
   document.getElementById("question").classList.remove("active");
   const res = await fetch("/api/analyze", {
@@ -323,7 +315,7 @@ function finalizeResults() {
     body: JSON.stringify({ questions: answers })
   });
   const data = await res.json();
-  const emotion = data.emotion || "calm";
+  emotion = data.emotion || "calm";
   const definition = data.definition || "You feel steady and relaxed.";
   const synonyms = Array.isArray(data.synonyms) ? data.synonyms.join(", ") : "still, balanced, content";
   const resultText = `Emotion: ${emotion}
@@ -402,17 +394,19 @@ function copySummary() {
     }
   function getStepLabel(id) {
   const map = {
-    valence: "Step 1 of 3",
-    arousal: "Step 2 of 3",
-    control: "Step 3 of 3"
+    valence: "Step 1 of 4",
+    arousal: "Step 2 of 4",
+    control: "Step 3 of 4",
+    intensity: "Step 4 of 4"
   };
   return map[id] || "";
 }
 function updateProgress(id) {
   const map = {
-    valence: 33,
-    arousal: 66,
-    control: 100
+    valence: 25,
+    arousal: 50,
+    control: 75,
+    intensity: 100
   };
   const pct = map[id] || 0;
   document.getElementById("progress-bar").style.width = pct + "%";
