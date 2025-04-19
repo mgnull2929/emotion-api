@@ -85,7 +85,26 @@
   </style>
 </head>
 <body>
-  <div id="intro" class="step active">
+  <div id="question" class="step">
+  <h2 id="question-text"></h2>
+  <div class="slider-row">
+    <span class="slider-label"></span>
+    <input type="range" id="slider" min="1" max="5" value="3" />
+    <span class="slider-label"></span>
+  </div>
+  <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="nextQuestion()">Next</button>
+
+  <div class="progress-container" style="margin-top: 30px;">
+    <div class="progress-label">Progress:</div>
+    <div class="progress-bar">
+      <div class="progress-thumb" id="progress-thumb">
+        <img src="Car2.png" alt="car" style="height: 20px;" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="intro" class="step active">
   <h1>What are you McKFeeling today?</h1>
   <p>This quiz helps you identify your current emotional state using science-backed questions.</p>
   <ul>
@@ -175,25 +194,6 @@ document.getElementById("output").classList.add("active");
     // Background gradient change removed per user preference
   
 </script>
-
-<div id="question" class="step">
-  <h2 id="question-text"></h2>
-  <div class="slider-row">
-    <span class="slider-label"></span>
-    <input type="range" id="slider" min="1" max="5" value="3" />
-    <span class="slider-label"></span>
-  </div>
-  <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="nextQuestion()">Next</button>
-
-  <div class="progress-container" style="margin-top: 30px;">
-    <div class="progress-label">Progress:</div>
-    <div class="progress-bar">
-      <div class="progress-thumb" id="progress-thumb">
-        <img src="Car2.png" alt="car" style="height: 20px;" />
-      </div>
-    </div>
-  </div>
-</div>
 
 
 </body>
