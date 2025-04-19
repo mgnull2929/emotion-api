@@ -4,57 +4,73 @@ import cors from "cors";
 import dotenv from "dotenv";
 import OpenAI from "openai";
 
-// 1. Load your .env
+// Load environment variables
 dotenv.config();
 
-// 2. Create and configure Express
+// Configure Express
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public")); // serves index.html from /public
+app.use(express.static("public")); // Serve HTML and static assets
 
-// 3. Initialize OpenAI client
+// Initialize OpenAI client
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// 4. Define AI descriptor endpoint (single-question use)
+// Single adjective generator
 app.post("/api/term", async (req, res) => {
   const { question, value } = req.body;
   try {
     const chat = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You’re a therapist. Give one adjective." },
-        { role: "user", content: `Answer ${value} for: "${question}".` }
+        { role: "system", content: "You're a therapist. Given the question and slider value, return one emotional adjective only." },
+        { role: "user", content: `Q: ${question}\nSlider value: ${value}` }
       ]
     });
-    res.json({ term: chat.choices[0].message.content.trim() });
+
+    const term = chat.choices[0].message.content.trim();
+    res.json({ term });
   } catch (err) {
-    console.error("Error in /api/term:", err);
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({ error: "Error generating term", detail: err.message });
   }
 });
 
-// 5. Define new AI analysis endpoint for all answers combined
+// Full emotion analysis
 app.post("/api/analyze", async (req, res) => {
   const { questions } = req.body;
   try {
-    const formatted = questions.map((q, i) => `Q${i + 1}: ${q.prompt} = ${q.value}`).join("\n");
+    const basePrompt = questions.map((q, i) => `Q${i+1}: ${q.prompt} → ${q.value}`).join("\n");
 
     const chat = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You are a psychologist. Read all emotional questions and answers, and return the most likely overall emotion the person is experiencing. Respond with one word." },
-        { role: "user", content: `Here are the responses:\n\n${formatted}` }
-      ]
+        {
+          role: "system",
+          content: `You are an emotion analyst. Based on slider answers, return a combined emotion, its definition, and 3 synonyms. Always return something, even if neutral. Use JSON: {"overall": "emotion", "definition": "text", "synonyms": ["word1", "word2", "word3"]}.`
+        },
+        {
+          role: "user",
+          content: `Answers:\n${basePrompt}`
+        }
+      ],
+      temperature: 0.5
     });
 
-    res.json({ overall: chat.choices[0].message.content.trim() });
+    const raw = chat.choices[0].message.content.trim();
+    const start = raw.indexOf("{");
+    const end = raw.lastIndexOf("}");
+    const json = JSON.parse(raw.slice(start, end + 1));
+
+    res.json(json);
   } catch (err) {
-    console.error("Error in /api/analyze:", err);
-    res.status(500).json({ error: err.message });
+    console.error("Analyze error:", err);
+    res.status(500).json({ error: "Failed to analyze emotion", detail: err.message });
   }
 });
 
-// 6. Start listening
+// Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`API listening on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ API listening on http://localhost:${PORT}`);
+});
