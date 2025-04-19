@@ -11,7 +11,7 @@
       padding: 20px;
       max-width: 600px;
       margin: auto;
-      background-image: url("Mckfeelingsbkrd.png");
+      background-color: #e0f7ff;
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
@@ -28,6 +28,8 @@
     }
     .slider-label { width: 120px; text-align: center; }
     input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
       width: 100%;
       height: 6px;
       background: #ddd;
@@ -36,6 +38,7 @@
       margin: 0 10px;
     }
     input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
       width: 16px;
       height: 16px;
       background: #4CAF50;
@@ -43,6 +46,8 @@
       cursor: pointer;
     }
     button {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 12px;
   background: url("Cloud.png") no-repeat center center;
   background-size: contain;
   border: none;
@@ -76,6 +81,15 @@
       margin-top: 10px;
     }
       @media (max-width: 480px) {
+    .slider-row {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .slider-label {
+      width: auto;
+      font-size: 0.9rem;
+    }
       body {
         padding: 10px;
       }
@@ -118,18 +132,18 @@
 <body>
   <h1 style="text-align: center; font-family: 'Comic Sans MS', cursive, sans-serif; font-size: 1.4rem; margin-top: 10px; margin-bottom: 5px; text-shadow: 1px 1px 2px #fff;">What are you McKFeeling like today?</h1>
   <div id="intro" class="step active">
-    <h1>Emotion Identifier Quiz</h1>
+    <h2>Emotion Identifier Quiz</h2>
     <p>This quiz helps you pinpoint your current feeling by guiding you through slider-based questions drawn from therapeutic techniques.</p>
-    <button onclick="startQuiz()">Start Quiz</button>
+    <button onclick="startQuiz()">Start Quiz</button><br><button onclick="location.reload()" style="margin-top: 10px; font-size: 0.8rem; padding: 10px 20px;">← Restart</button>
   </div>
 
   <div id="quiz-container" class="step">
     <div id="question" class="fade-in">
       <div class="step-count" id="step-count"></div>
       <h2 id="question-text"></h2>
-      <div class="slider-row">
+      <div class="slider-row" style="flex-wrap: wrap; gap: 10px;">
   <span class="slider-label" id="left-label"></span>
-  <input id="slider" type="range" min="1" max="5" step="1" value="3" />
+  <input id="slider" type="range" min="1" max="5" step="1" value="3" aria-label="How strongly do you feel on this scale?" />
   <span class="slider-label" id="right-label"></span>
 </div>
 <div class="slider-value" id="slider-value">You chose: Neutral</div>
@@ -194,6 +208,10 @@
     const answers = [];
 
     function loadQuestion(q) {
+  const qEl = document.getElementById("question");
+  qEl.classList.remove("fade-in");
+  void qEl.offsetWidth;
+  qEl.classList.add("fade-in");
   document.getElementById("question-text").textContent = q.text;
   document.getElementById("left-label").textContent = q.left;
   document.getElementById("right-label").textContent = q.right;
