@@ -71,21 +71,22 @@
     <li>See where you land on an emotion wheel</li>
     <li>Get a one-word emotion, synonyms, and insight</li>
   </ul>
-  <button onclick="startQuiz()">Start Quiz</button>
+  <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="startQuiz()">Start Quiz</button>
 </div>
 
 
-    <div id="question" class="step active">
+    <div id="question" class="step">
       <h2 id="question-text">How pleasant or unpleasant do you feel right now?</h2>
       <div class="slider-row">
         <span class="slider-label">Unpleasant</span>
         <input type="range" id="slider" min="1" max="5" value="3">
         <span class="slider-label">Pleasant</span>
       </div>
-      <button onclick="nextQuestion()">Next</button>
+      <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="nextQuestion()">Next</button>
     </div>
 
-      <p style="font-size: 0.9rem; margin-bottom: 10px;">Tap or click near the emotion group that feels closest to how you feel right now.</p>
+      <div id="emotion-wheel" class="step" style="display: none;">
+  <p style="font-size: 0.9rem; margin-bottom: 10px;">Tap or click near the emotion group that feels closest to how you feel right now.</p>
   <svg viewBox="0 0 200 200" width="200" height="200">
     <defs>
       <linearGradient id="gradTL" x1="0" y1="1" x2="0.5" y2="0.5">
@@ -111,23 +112,30 @@
     <rect x="100" y="100" width="100" height="100" fill="url(#gradBR)"/>
     <line x1="0" y1="100" x2="200" y2="100" stroke="#666" stroke-width="1" />
     <line x1="100" y1="0" x2="100" y2="200" stroke="#666" stroke-width="1" />
-    $1
+    
     <rect x="0" y="0" width="200" height="200" fill="transparent" onclick="handleQuadrantClick(event)" onmousemove="handleHover(event)" />
     <text x="30" y="60" font-size="12" fill="#333">Sad / Numb</text>
     <text x="130" y="60" font-size="12" fill="#333">Calm / Content</text>
     <text x="30" y="160" font-size="12" fill="#333">Anxious / Angry</text>
     <text x="130" y="160" font-size="12" fill="#333">Excited / Happy</text>
-  <text id="hover-label" x="100" y="105" text-anchor="middle" font-size="12" fill="#222"></text>
-</svg>
-  <button onclick="handleQuadrantContinue()">Continue</button>
+    <text id="hover-label" x="100" y="105" text-anchor="middle" font-size="12" fill="#222"></text>
+    <circle id="dot" cx="100" cy="100" r="5" fill="#000" style="transition: cx 0.5s ease, cy 0.5s ease;" />
+  </svg>
+  <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="handleQuadrantContinue()">Continue</button>
 </div>
-  </div>
 
-  $1
+<div id="output" class="step" style="display: none;"></div>
 
+<script>
 let selectedQuadrant = null;
 let current = 0;
-const questions = [];
+const questions = [
+  { text: "How pleasant or unpleasant do you feel right now?", left: "Unpleasant", right: "Pleasant", id: "valence" },
+  { text: "How physically or mentally energized do you feel?", left: "Low Energy", right: "High Energy", id: "arousal" },
+  { text: "Do you feel in control of your situation?", left: "Out of Control", right: "In Control", id: "control" },
+  { text: "Do you feel connected or isolated right now?", left: "Isolated", right: "Connected", id: "connection" },
+  { text: "Is this feeling clear or confusing?", left: "Confusing", right: "Clear", id: "clarity" }
+];
 
 function handleQuadrantContinue() {
   if (!selectedQuadrant) return alert("Please click on the quadrant that matches how you feel.");
@@ -154,20 +162,23 @@ function startQuiz() {
     const answers = [];
 
     function nextQuestion() {
-      const sliderValue = document.getElementById("slider").value;
-      answers.push({ prompt: questions[current].text, value: +sliderValue });
+  if (current === 5) {
+    document.getElementById("question").classList.remove("active");
+    document.getElementById("emotion-wheel").style.display = "block";
+    document.getElementById("emotion-wheel").classList.add("active");
+    return;
+  }
+  if (current < questions.length) {
+    const sliderValue = +document.getElementById("slider").value;
+    answers.push({ prompt: questions[current].text, value: sliderValue });
+    current++;
+    updateQuestion();
+  } else {
+    showResults();
+  }
+}
 
-      // Adaptive logic placeholder (can branch later)
-      current++;
-
-      if (current < questions.length) {
-        updateQuestion();
-      } else {
-        showResults();
-      }
-    }
-
-    function updateQuestion() {
+function updateQuestion() {
       const q = questions[current];
       document.getElementById("question-text").textContent = q.text;
       document.querySelectorAll(".slider-label")[0].textContent = q.left;
@@ -199,10 +210,11 @@ document.getElementById("output").innerHTML = `
         <p><strong>Emotion:</strong> ${emotion}</p>
         <p><strong>Definition:</strong> ${definition}</p>
         <p><strong>Synonyms:</strong> ${synonyms}</p>
-        <button onclick="location.reload()">Try Again</button>
+        <button style="background: url('Cloud2.png') no-repeat center center; background-size: contain; border: none; color: #000; font-weight: bold; font-size: 1rem; padding: 30px 60px; margin: 5px; cursor: pointer; text-align: center; text-shadow: 0 0 2px #fff;" onclick="location.reload()">Try Again</button>
       `;
 
-      document.getElementById("output").classList.add("active");
+      document.getElementById("output").style.display = "block";
+document.getElementById("output").classList.add("active");
     }
 
     // Background gradient change removed per user preference
@@ -235,8 +247,8 @@ function handleHover(evt) {
   else if (cx > 100 && cy < 100) hoverText = "Calm / Content";
   document.getElementById("hover-label").textContent = hoverText;
 }
+</script>
 
-$1
-<div id="output" class="step"></div>
+
 </body>
 </html>
