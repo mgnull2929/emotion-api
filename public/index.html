@@ -98,7 +98,7 @@
     <div class="progress-label">Progress:</div>
     <div class="progress-bar">
       <div class="progress-thumb" id="progress-thumb">
-        <img src="Car2.png" alt="car" style="height: 20px;" />
+        <img src="Car2.png" alt="car" style="height: 40px; transform: translateY(-15px);" />
       </div>
     </div>
   </div>
@@ -141,10 +141,17 @@ function startQuiz() {
     const answers = [];
 
     function nextQuestion() {
-  
   if (current < questions.length) {
     const sliderValue = +document.getElementById("slider").value;
     answers.push({ prompt: questions[current].text, value: sliderValue });
+    current++;
+    if (current < questions.length) {
+      updateQuestion();
+    } else {
+      showResults();
+    }
+  }
+});
     current++;
     updateQuestion();
   } else {
